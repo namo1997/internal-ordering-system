@@ -370,6 +370,7 @@
             width: 100%;
             font-size: 1rem;
             font-weight: 500;
+            position: relative;
         }
 
         .dept-card:hover {
@@ -379,6 +380,20 @@
 
         .dept-card.active {
             background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+        }
+
+        .dept-card .edit-order-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: 1px solid white;
+            border-radius: 15px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
         }
 
         /* Category Tabs */
@@ -610,7 +625,9 @@
             margin-top: 2rem;
             padding-top: 1rem;
             border-top: 2px solid #e0e0e0;
-            text-align: right;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
         }
 
         .checkout-btn {
@@ -623,7 +640,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            width: 100%;
         }
 
         .checkout-btn:hover {
@@ -756,20 +772,14 @@
                     </div>
                 </div>
 
-                <div id="departmentSection" class="department-section hidden">
-                    <!-- This section is now bypassed -->
-                </div>
-
                 <div id="categorySection" class="hidden">
                     <h2>2. เลือกสินค้า</h2>
                     <div class="category-tabs" id="categoryTabs">
                         <!-- Categories will be dynamically inserted here -->
                     </div>
-
                     <div class="form-group" style="margin-bottom: 2rem;">
                         <input type="text" class="form-input" id="searchInput" placeholder="🔍 ค้นหาชื่อสินค้า...">
                     </div>
-
                     <div class="products-grid" id="productsGrid">
                         <!-- Products will be dynamically inserted here -->
                     </div>
@@ -798,14 +808,15 @@
         <div class="cart-modal" id="cartModal">
             <div class="cart-content">
                 <div class="cart-header">
-                    <h2>ตะกร้าสินค้า</h2>
+                    <h2 id="cartTitle">ตะกร้าสินค้า</h2>
                     <button class="close-cart" onclick="closeCart()">&times;</button>
                 </div>
                 <div id="cartItems">
                     <!-- Cart items will be dynamically inserted here -->
                 </div>
                 <div class="cart-total">
-                    <button class="checkout-btn" onclick="checkout()">ยืนยันการสั่งซื้อ</button>
+                    <button id="deleteOrderBtn" class="delete-btn hidden" onclick="deleteCurrentOrder()">ยกเลิกคำสั่งซื้อ</button>
+                    <button id="checkoutBtn" class="checkout-btn">ยืนยันการสั่งซื้อ</button>
                 </div>
             </div>
         </div>
@@ -816,7 +827,7 @@
 
     <script>
         // --- Google Sheet Integration ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLY3tNcv-RPjX1ekMh3kGqJhM-ttYD5tDadpSz8Bi-NIhJoUI2xw7ZiuOq_uv8EL_9/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqB1iHxUEd58xH1cfNIoKsTBGXvWJMra7BXM5CY6vRNuwezqGLSNHPHZ51MK23fORR/exec';
 
         // State management
         let currentUser = null;
@@ -826,6 +837,7 @@
         let cart = [];
         let activeAdminTab = 'manageDates';
         let currentSummaryData = [];
+        let existingOrderId = null;
 
         // Data stores
         let users = [];
@@ -896,14 +908,9 @@
 
             try {
                 const dataPromises = [
-                    fetchData('Users'),
-                    fetchData('Departments'),
-                    fetchData('Categories'),
-                    fetchData('Products'),
-                    fetchData('OrderDates'),
-                    fetchData('Units')
+                    fetchData('Users'), fetchData('Departments'), fetchData('Categories'),
+                    fetchData('Products'), fetchData('OrderDates'), fetchData('Units')
                 ];
-
                 [users, departments, categories, products, orderDates, units] = await Promise.all(dataPromises);
                 
                 console.log("All data fetched and stored.");
@@ -924,7 +931,7 @@
 
             if (user) {
                 currentUser = user;
-                selectedDepartment = user.department; // Set department automatically
+                selectedDepartment = user.department;
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 const deptName = departments.find(d => d.id === user.department)?.name || 'ไม่พบแผนก';
@@ -958,9 +965,9 @@
             cart = [];
             updateCartCount();
             selectedOrderDate = null;
-            selectedDepartment = currentUser ? currentUser.department : ''; // Keep department on reset
+            selectedDepartment = currentUser ? currentUser.department : '';
             selectedCategory = 'all';
-            document.getElementById('departmentSection').classList.add('hidden');
+            existingOrderId = null;
             document.getElementById('categorySection').classList.add('hidden');
             if (document.getElementById('productsGrid')) {
                 renderProducts();
@@ -974,29 +981,29 @@
                 adminPanel.style.display = 'none';
                 orderSection.style.display = 'block';
             }
-            
             resetOrderState();
             renderOrderDates();
         }
 
         // --- User Ordering Flow ---
-        function renderOrderDates() {
+        async function renderOrderDates() {
             const grid = document.getElementById('orderDateGrid');
             const openDates = orderDates.filter(d => d.status === 'open');
-
-            if (openDates.length === 0) {
-                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่มีวันที่เปิดรับออเดอร์ในขณะนี้</p>`;
-                return;
-            }
             
+            // Fetch user's existing orders for open dates
+            const userOrders = await fetchData('Orders', { userId: currentUser.id });
+
             grid.innerHTML = [...openDates]
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .map(d => `
-                <button class="dept-card" onclick="selectOrderDate(this, '${d.date}')">
-                    <div>📅</div>
-                    <div>${new Date(d.date).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                </button>
-            `).join('');
+                .map(d => {
+                    const hasOrder = userOrders.some(o => o.orderDate === d.date);
+                    return `
+                    <button class="dept-card" onclick="selectOrderDate(this, '${d.date}')">
+                        <div>📅</div>
+                        <div>${new Date(d.date).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        ${hasOrder ? `<div class="edit-order-btn" onclick="event.stopPropagation(); editOrder('${d.date}')">ดู/แก้ไขคำสั่งซื้อ</div>` : ''}
+                    </button>
+                `}).join('');
         }
 
         function selectOrderDate(element, date) {
@@ -1007,18 +1014,42 @@
             selectedOrderDate = date;
             document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
-            
-            // Bypass department selection and go straight to products
             document.getElementById('categorySection').classList.remove('hidden');
             if(document.getElementById('searchInput')) {
-                document.getElementById('searchInput').value = ''; // Clear search
+                document.getElementById('searchInput').value = '';
             }
             renderProducts();
         }
 
-        // renderDepartments and selectDepartment are no longer needed in the user flow
-        function renderDepartments() { /* Deprecated */ }
-        function selectDepartment() { /* Deprecated */ }
+        async function editOrder(date) {
+            showNotification('กำลังโหลดคำสั่งซื้อเดิม...', false);
+            const userOrders = await fetchData('Orders', { userId: currentUser.id, orderDate: date });
+            if (userOrders && userOrders.length > 0) {
+                cart = userOrders.map(order => ({
+                    ...products.find(p => p.id === order.productId),
+                    quantity: order.quantity,
+                    remark: order.remark,
+                    department: order.department
+                }));
+                existingOrderId = userOrders[0].orderId;
+                selectedOrderDate = date;
+                
+                document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => {
+                    if (card.getAttribute('onclick').includes(`'${date}'`)) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
+                    }
+                });
+
+                document.getElementById('categorySection').classList.remove('hidden');
+                renderProducts();
+                updateCartCount();
+                openCart();
+            } else {
+                showNotification('ไม่พบคำสั่งซื้อเดิม หรือเกิดข้อผิดพลาด', true);
+            }
+        }
 
         function renderCategories() {
             const tabs = document.getElementById('categoryTabs');
@@ -1041,14 +1072,12 @@
             const grid = document.getElementById('productsGrid');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-            let filteredProducts = selectedCategory === 'all'
-                ? products
+            let filteredProducts = selectedCategory === 'all' 
+                ? products 
                 : products.filter(p => p.category === selectedCategory);
 
             if (searchTerm) {
-                filteredProducts = filteredProducts.filter(p =>
-                    p.name.toLowerCase().includes(searchTerm)
-                );
+                filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
             }
             
             if (filteredProducts.length === 0) {
@@ -1090,7 +1119,6 @@
             }
             
             const product = products.find(p => p.id === productId);
-            // Department is now fixed per user, so we don't need to check it in the cart find logic
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -1101,7 +1129,7 @@
             
             updateCartCount();
             showNotification('เพิ่มสินค้าลงตะกร้าแล้ว');
-            renderProducts(); // Re-render products to show badge
+            renderProducts();
         }
 
         function updateCartCount() {
@@ -1120,6 +1148,20 @@
 
         function renderCart() {
             const cartItemsDiv = document.getElementById('cartItems');
+            const deleteBtn = document.getElementById('deleteOrderBtn');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const cartTitle = document.getElementById('cartTitle');
+
+            if (existingOrderId) {
+                cartTitle.textContent = 'แก้ไขคำสั่งซื้อ';
+                deleteBtn.classList.remove('hidden');
+                checkoutBtn.textContent = 'บันทึกการเปลี่ยนแปลง';
+            } else {
+                cartTitle.textContent = 'ตะกร้าสินค้า';
+                deleteBtn.classList.add('hidden');
+                checkoutBtn.textContent = 'ยืนยันการสั่งซื้อ';
+            }
+
             if (cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p style="text-align: center; color: #666;">ตะกร้าว่างเปล่า</p>';
                 return;
@@ -1155,34 +1197,55 @@
             }
             updateCartCount();
             renderCart();
-            renderProducts(); // Re-render products to update badge
+            renderProducts();
         }
 
         async function checkout() {
-            if (cart.length === 0) {
-                alert('กรุณาเลือกสินค้าก่อนดำเนินการสั่งซื้อ');
+            const isEditing = !!existingOrderId;
+            if (cart.length === 0 && isEditing) {
+                deleteCurrentOrder();
                 return;
             }
-            if (!confirm('ยืนยันการสั่งซื้อ? ข้อมูลจะถูกส่งไปยัง Google Sheet')) return;
+            if (cart.length === 0) {
+                alert('กรุณาเลือกสินค้าก่อน');
+                return;
+            }
+            if (!confirm(isEditing ? 'ยืนยันการแก้ไขคำสั่งซื้อ?' : 'ยืนยันการสั่งซื้อ?')) return;
 
             const payload = {
                 action: 'submitOrder',
                 data: {
                     orderDate: selectedOrderDate,
                     user: { id: currentUser.id, name: currentUser.name },
-                    cart: cart
+                    cart: cart,
+                    existingOrderId: existingOrderId
                 }
             };
 
             const result = await postData(payload);
             
             if (result.status === 'success') {
-                alert(`ส่งคำสั่งซื้อสำหรับวันที่ ${new Date(selectedOrderDate).toLocaleDateString('th-TH')} เรียบร้อยแล้ว`);
+                alert(isEditing ? 'แก้ไขคำสั่งซื้อเรียบร้อยแล้ว' : 'ส่งคำสั่งซื้อเรียบร้อยแล้ว');
                 resetOrderState();
                 closeCart();
                 renderOrderDates();
             } else {
                 alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        async function deleteCurrentOrder() {
+            if (!existingOrderId) return;
+            if (!confirm('คุณต้องการยกเลิกคำสั่งซื้อนี้ทั้งหมดใช่หรือไม่?')) return;
+
+            const result = await postData({ action: 'deleteOrder', data: { orderId: existingOrderId } });
+            if (result.status === 'success') {
+                alert('ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว');
+                resetOrderState();
+                closeCart();
+                renderOrderDates();
+            } else {
+                alert('เกิดข้อผิดพลาดในการยกเลิกคำสั่งซื้อ');
             }
         }
 
@@ -1295,7 +1358,7 @@
             
             try {
                 const ordersForDay = await fetchData('Orders', { orderDate: selectedDate });
-                currentSummaryData = ordersForDay; // Store for printing
+                currentSummaryData = ordersForDay;
 
                 if (ordersForDay.length === 0) {
                     resultDiv.innerHTML = '<p>ไม่พบข้อมูลการสั่งซื้อสำหรับวันที่เลือก</p>';
@@ -1536,7 +1599,7 @@
                     <h3>ข้อมูลผู้ใช้</h3>
                      <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
                     <table class="admin-table">
-                        <thead><tr><th>รหัส</th><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>สิทธิ์</th></tr></thead>
+                        <thead><tr><th>รหัส</th><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>สิทธิ์</th><th>แผนก</th></tr></thead>
                         <tbody>
                             ${users.map(user => `
                                 <tr>
@@ -1544,6 +1607,7 @@
                                     <td>${user.username}</td>
                                     <td>${user.name}</td>
                                     <td>${user.role === 'admin' ? 'ผู้ดูแล' : 'ผู้ใช้งาน'}</td>
+                                    <td>${departments.find(d => d.id === user.department)?.name || user.department}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
