@@ -799,7 +799,7 @@
 
     <script>
         // --- Google Sheet Integration ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby98PSHO1lYX5FpnKErx-XBDF2E2lM-cWzjYT3CdweJ9Pg6YSoF4sy2PvIQAqzucrWy/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpICde0Ls-0yfmDxVp5MOcKlTE07c9uh6ohbxAwsPxAJ_HJsg8b3JzbMsIDQjLlg2W/exec';
 
         // State management
         let currentUser = null;
@@ -821,16 +821,13 @@
 
         // --- Data Communication Functions ---
         function fetchData(sheetName, params = {}) {
-            // For initial load, we don't pass a sheetName
-            const url = sheetName ? `${SCRIPT_URL}?sheet=${sheetName}&${new URLSearchParams(params)}` : SCRIPT_URL;
-
             return new Promise((resolve, reject) => {
                 const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
                 const timer = setTimeout(() => {
                     delete window[callbackName];
                     if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Timeout fetching data.`));
-                }, 15000); // Increased timeout for bulk load
+                    reject(new Error(`Timeout fetching data from ${sheetName || 'initial load'}.`));
+                }, 15000);
 
                 window[callbackName] = function(data) {
                     clearTimeout(timer);
@@ -843,13 +840,19 @@
                     }
                 };
 
+                const allParams = { ...params, callback: callbackName };
+                if (sheetName) {
+                    allParams.sheet = sheetName;
+                }
+                
+                const queryString = new URLSearchParams(allParams).toString();
                 const script = document.createElement('script');
-                script.src = `${url}&callback=${callbackName}`;
+                script.src = `${SCRIPT_URL}?${queryString}`;
                 script.onerror = () => {
                     clearTimeout(timer);
                     delete window[callbackName];
                     if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Error fetching data via JSONP.`));
+                    reject(new Error(`Error fetching data from ${sheetName || 'initial load'} via JSONP.`));
                 };
                 document.body.appendChild(script);
             });
@@ -1662,5 +1665,6 @@
             if (event.target === cartModal) closeCart();
         }
     </script>
+</body>
 </body>
 </html>
