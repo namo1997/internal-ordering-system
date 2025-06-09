@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสั่งของภายในองค์กร</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00d09c;
+            box-shadow: 0 0 0 3px rgba(0,208,156,0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .error-message {
+            background: #ff5252;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .cart-count {
+            background: #ff5722;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .admin-tab.active {
+            color: #00d09c;
+        }
+
+        .admin-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00d09c;
+        }
+
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+        
+        .admin-section h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-section .small-text {
+            margin-bottom: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Table Styles */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .admin-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .admin-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin-right: 0.5rem;
+        }
+
+        .edit-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #1976D2;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .add-btn {
+            background: #00d09c;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #00b386;
+            transform: translateY(-2px);
+        }
+
+        /* Modal for Add/Edit */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            padding: 2rem;
+            animation: slideUp 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Department Section */
+        .department-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .department-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .dept-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .dept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .dept-card.active {
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .category-tab {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .category-tab:hover {
+            border-color: #00d09c;
+            transform: translateY(-2px);
+        }
+
+        .category-tab.active {
+            background: #00d09c;
+            color: white;
+            border-color: #00d09c;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative; /* Added for badge positioning */
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-card .quantity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff5722;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            border: 2px solid white;
+            transition: transform 0.2s ease-in-out;
+            transform: scale(0); /* Hidden by default */
+        }
+
+        .product-card .quantity-badge.visible {
+            transform: scale(1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            min-height: 40px;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-unit {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00d09c;
+        }
+
+        .add-to-cart {
+            background: #00d09c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .add-to-cart:hover {
+            background: #00b386;
+            transform: scale(1.05);
+        }
+
+        /* Cart Modal */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            animation: fadeIn 0.3s;
+        }
+
+        .cart-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .cart-item-dept {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: #00d09c;
+            color: white;
+        }
+
+        .cart-total {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e0e0e0;
+            text-align: right;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            #print-area table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12pt;
+                margin-top: 1rem;
+            }
+            #print-area th, #print-area td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+            }
+            #print-area h2, #print-area h3, #print-area h4 {
+                margin-bottom: 1rem;
+                color: #000;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .department-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .admin-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .admin-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">🔐</div>
+            <h2 class="login-title">เข้าสู่ระบบ</h2>
+            <div id="loginError" class="error-message"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">ชื่อผู้ใช้</label>
+                    <input type="text" class="form-input" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-input" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span>📦</span>
+                    <span>ระบบสั่งของภายใน</span>
+                </div>
+                <div class="header-nav">
+                    <div class="user-info">
+                        <span>👤</span>
+                        <span id="currentUser">User</span>
+                    </div>
+                    <button class="nav-btn" onclick="openCart()">
+                        <span>🛒 ตะกร้า</span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                    <button id="adminBtn" class="nav-btn hidden" onclick="toggleAdminPanel()">
+                        <span>⚙️ ตั้งค่า</span>
+                    </button>
+                    <button class="nav-btn" onclick="logout()">
+                        <span>🚪 ออกจากระบบ</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Order Section -->
+            <div id="orderSection">
+                <div class="department-section">
+                    <h2>1. เลือกวันที่สั่งซื้อ</h2>
+                    <div class="department-grid" id="orderDateGrid">
+                        <!-- Order Dates will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div id="departmentSection" class="department-section hidden">
+                    <h2>2. เลือกแผนกของคุณ</h2>
+                    <div class="department-grid" id="departmentGrid">
+                        <!-- Departments will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div id="categorySection" class="hidden">
+                    <div class="category-tabs" id="categoryTabs">
+                        <!-- Categories will be dynamically inserted here -->
+                    </div>
+
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="admin-panel">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('manageDates')">จัดการวันสั่งซื้อ</button>
+                    <button class="admin-tab" onclick="showAdminTab('summary')">สรุปยอดสั่งซื้อ</button>
+                    <button class="admin-tab" onclick="showAdminTab('units')">จัดการหน่วยนับ</button>
+                    <button class="admin-tab" onclick="showAdminTab('products')">ข้อมูลสินค้า</button>
+                    <button class="admin-tab" onclick="showAdminTab('departments')">ข้อมูลแผนก</button>
+                    <button class="admin-tab" onclick="showAdminTab('categories')">ข้อมูลหมวดหมู่</button>
+                    <button class="admin-tab" onclick="showAdminTab('users')">ข้อมูลผู้ใช้</button>
+                </div>
+
+                <div id="adminContent">
+                    <!-- Admin content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="cart-modal" id="cartModal">
+            <div class="cart-content">
+                <div class="cart-header">
+                    <h2>ตะกร้าสินค้า</h2>
+                    <button class="close-cart" onclick="closeCart()">&times;</button>
+                </div>
+                <div id="cartItems">
+                    <!-- Cart items will be dynamically inserted here -->
+                </div>
+                <div class="cart-total">
+                    <button class="checkout-btn" onclick="checkout()">ยืนยันการสั่งซื้อ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Area -->
+    <div id="print-area"></div>
+
+    <script>
+        // --- Google Sheet Integration ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLY3tNcv-RPjX1ekMh3kGqJhM-ttYD5tDadpSz8Bi-NIhJoUI2xw7ZiuOq_uv8EL_9/exec';
+
+        // State management
+        let currentUser = null;
+        let selectedOrderDate = null;
+        let selectedDepartment = '';
+        let selectedCategory = 'all';
+        let cart = [];
+        let activeAdminTab = 'manageDates';
+        let currentSummaryData = [];
+
+        // Data stores
+        let users = [];
+        let departments = [];
+        let categories = [];
+        let products = [];
+        let orderDates = [];
+        let units = [];
+
+        // --- Data Communication Functions ---
+        function fetchData(sheetName, params = {}) {
+            return new Promise((resolve, reject) => {
+                const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
+                const timer = setTimeout(() => {
+                    delete window[callbackName];
+                    if (script.parentNode) document.body.removeChild(script);
+                    reject(new Error(`Timeout fetching data from ${sheetName}.`));
+                }, 10000);
+
+                window[callbackName] = function(data) {
+                    clearTimeout(timer);
+                    delete window[callbackName];
+                    if (script.parentNode) document.body.removeChild(script);
+                    if (data.error) {
+                        reject(new Error(data.error));
+                    } else {
+                        resolve(data);
+                    }
+                };
+
+                const queryString = new URLSearchParams(params).toString();
+                const script = document.createElement('script');
+                script.src = `${SCRIPT_URL}?sheet=${sheetName}&callback=${callbackName}&${queryString}`;
+                script.onerror = () => {
+                    clearTimeout(timer);
+                    delete window[callbackName];
+                    if (script.parentNode) document.body.removeChild(script);
+                    reject(new Error(`Error fetching data from ${sheetName} via JSONP.`));
+                };
+                document.body.appendChild(script);
+            });
+        }
+
+        async function postData(payload) {
+            showNotification('กำลังส่งข้อมูล...', false);
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                return { status: 'success' };
+            } catch (error) {
+                console.error('Error posting data:', error);
+                showNotification('เกิดข้อผิดพลาดในการส่งข้อมูล', true);
+                return { status: 'error', message: error.message };
+            }
+        }
+
+        // --- Initialization and Login Flow ---
+        async function initializeApp() {
+            console.log("Initializing app and fetching data...");
+            const loginBox = document.querySelector('.login-box');
+            const originalTitle = loginBox.querySelector('.login-title').textContent;
+            loginBox.querySelector('.login-title').textContent = 'กำลังโหลดข้อมูล...';
+
+            try {
+                const dataPromises = [
+                    fetchData('Users'),
+                    fetchData('Departments'),
+                    fetchData('Categories'),
+                    fetchData('Products'),
+                    fetchData('OrderDates'),
+                    fetchData('Units')
+                ];
+
+                [users, departments, categories, products, orderDates, units] = await Promise.all(dataPromises);
+                
+                console.log("All data fetched and stored.");
+                loginBox.querySelector('.login-title').textContent = originalTitle;
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+            } catch (error) {
+                loginBox.querySelector('.login-title').textContent = 'เกิดข้อผิดพลาดในการโหลด';
+                showNotification(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`, true);
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user = users.find(u => u.username === username && u.password.toString() === password);
+
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('currentUser').textContent = user.name;
+                
+                if (user.role === 'admin') {
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                }
+                
+                renderOrderDates();
+                renderCategories();
+            } else {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('adminBtn').classList.add('hidden');
+            resetOrderState();
+        }
+        
+        function resetOrderState() {
+            cart = [];
+            updateCartCount();
+            selectedOrderDate = null;
+            selectedDepartment = '';
+            selectedCategory = 'all';
+            document.getElementById('departmentSection').classList.add('hidden');
+            document.getElementById('categorySection').classList.add('hidden');
+            if (document.getElementById('productsGrid')) {
+                renderProducts();
+            }
+        }
+
+        // --- User Ordering Flow ---
+        function renderOrderDates() {
+            const grid = document.getElementById('orderDateGrid');
+            const openDates = orderDates.filter(d => d.status === 'open');
+
+            if (openDates.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่มีวันที่เปิดรับออเดอร์ในขณะนี้</p>`;
+                return;
+            }
+            
+            grid.innerHTML = [...openDates]
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map(d => `
+                <button class="dept-card" onclick="selectOrderDate(this, '${d.date}')">
+                    <div>📅</div>
+                    <div>${new Date(d.date).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                </button>
+            `).join('');
+        }
+
+        function selectOrderDate(element, date) {
+            if (selectedOrderDate !== date) {
+                resetOrderState();
+                updateCartCount();
+            }
+            selectedOrderDate = date;
+            document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('departmentSection').classList.remove('hidden');
+            renderDepartments();
+        }
+
+        function renderDepartments() {
+            const grid = document.getElementById('departmentGrid');
+            grid.innerHTML = departments.map(dept => `
+                <button class="dept-card" onclick="selectDepartment(this, '${dept.id}')">
+                    <div>${dept.icon}</div>
+                    <div>${dept.name}</div>
+                </button>
+            `).join('');
+        }
+
+        function selectDepartment(element, deptId) {
+            selectedDepartment = deptId;
+            document.querySelectorAll('#departmentGrid .dept-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('categorySection').classList.remove('hidden');
+            renderProducts();
+        }
+
+        function renderCategories() {
+            const tabs = document.getElementById('categoryTabs');
+            tabs.innerHTML = `
+                <button class="category-tab active" onclick="filterCategory(this, 'all')">ทั้งหมด</button>
+                ${categories.map(cat => `
+                    <button class="category-tab" onclick="filterCategory(this, '${cat.id}')">${cat.name}</button>
+                `).join('')}
+            `;
+        }
+
+        function filterCategory(element, categoryId) {
+            selectedCategory = categoryId;
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const filteredProducts = selectedCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === selectedCategory);
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่พบสินค้าในหมวดหมู่นี้</p>`;
+                return;
+            }
+
+            grid.innerHTML = filteredProducts.map(product => {
+                const itemInCart = cart.find(item => item.id === product.id);
+                const quantity = itemInCart ? itemInCart.quantity : 0;
+
+                return `
+                <div class="product-card" onclick="addToCart(${product.id})">
+                    <div class="quantity-badge ${quantity > 0 ? 'visible' : ''}" id="badge-${product.id}">${quantity}</div>
+                    <div class="product-image">${product.icon || '📦'}</div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-footer">
+                            <div class="product-unit">${product.unit || 'N/A'}</div>
+                            <button class="add-to-cart" onclick="event.stopPropagation(); addToCart(${product.id})">
+                                เพิ่มลงตะกร้า
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // --- Cart and Checkout ---
+        function addToCart(productId) {
+            if (!selectedOrderDate) {
+                alert('กรุณาเลือกวันที่สั่งซื้อก่อน');
+                return;
+            }
+            if (!selectedDepartment) {
+                alert('กรุณาเลือกแผนกก่อน');
+                return;
+            }
+            
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId && item.department === selectedDepartment);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...product, department: selectedDepartment, quantity: 1, remark: '' });
+            }
+            
+            updateCartCount();
+            showNotification('เพิ่มสินค้าลงตะกร้าแล้ว');
+            renderProducts(); // Re-render products to show badge
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        function openCart() {
+            document.getElementById('cartModal').style.display = 'block';
+            renderCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function renderCart() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="text-align: center; color: #666;">ตะกร้าว่างเปล่า</p>';
+                return;
+            }
+            
+            cartItemsDiv.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-dept">แผนก: ${departments.find(d => d.id === item.department)?.name || ''}</div>
+                        <input type="text" class="form-input" style="margin-top: 0.5rem;" placeholder="เพิ่มหมายเหตุ..." value="${item.remark || ''}" onchange="updateRemark(${index}, this.value)">
+                    </div>
+                    <div class="cart-item-controls">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        </div>
+                        <div style="font-weight: bold;">${item.unit}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateRemark(index, value) {
+            cart[index].remark = value;
+        }
+
+        function updateQuantity(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartCount();
+            renderCart();
+            renderProducts(); // Re-render products to update badge
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                alert('กรุณาเลือกสินค้าก่อนดำเนินการสั่งซื้อ');
+                return;
+            }
+            if (!confirm('ยืนยันการสั่งซื้อ? ข้อมูลจะถูกส่งไปยัง Google Sheet')) return;
+
+            const payload = {
+                action: 'submitOrder',
+                data: {
+                    orderDate: selectedOrderDate,
+                    user: { id: currentUser.id, name: currentUser.name },
+                    cart: cart
+                }
+            };
+
+            const result = await postData(payload);
+            
+            if (result.status === 'success') {
+                alert(`ส่งคำสั่งซื้อสำหรับวันที่ ${new Date(selectedOrderDate).toLocaleDateString('th-TH')} เรียบร้อยแล้ว`);
+                resetOrderState();
+                closeCart();
+                renderOrderDates();
+            } else {
+                alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+            }
+        }
+
+        // --- Admin Panel Functions ---
+        function toggleAdminPanel() {
+            const orderSection = document.getElementById('orderSection');
+            const adminPanel = document.getElementById('adminPanel');
+            
+            if (adminPanel.style.display === 'block') {
+                adminPanel.style.display = 'none';
+                orderSection.style.display = 'block';
+                renderOrderDates();
+            } else {
+                adminPanel.style.display = 'block';
+                orderSection.style.display = 'none';
+                showAdminTab('manageDates');
+            }
+        }
+
+        function showAdminTab(tab) {
+            activeAdminTab = tab;
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            const clickedButton = Array.from(document.querySelectorAll('.admin-tab')).find(button => button.getAttribute('onclick').includes(`'${tab}'`));
+            if (clickedButton) clickedButton.classList.add('active');
+            
+            switch(tab) {
+                case 'manageDates': renderManageDatesAdmin(); break;
+                case 'summary': renderOrderSummaryAdmin(); break;
+                case 'units': renderUnitsAdmin(); break;
+                case 'products': renderProductsAdmin(); break;
+                case 'departments': renderDepartmentsAdmin(); break;
+                case 'categories': renderCategoriesAdmin(); break;
+                case 'users': renderUsersAdmin(); break;
+            }
+        }
+
+        function renderManageDatesAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>จัดการวันสั่งซื้อ</h3>
+                    <p class="small-text">ฝ่ายจัดซื้อสามารถปิดรับออเดอร์ในแต่ละวันได้ที่นี่ ข้อมูลจะอัปเดตใน Google Sheet โดยตรง</p>
+                    <table class="admin-table">
+                        <thead><tr><th>วันที่</th><th>สถานะ</th><th>การจัดการ</th></tr></thead>
+                        <tbody>
+                            ${[...orderDates].sort((a, b) => new Date(b.date) - new Date(a.date)).map(d => `
+                                <tr>
+                                    <td>${new Date(d.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                                    <td><span style="color: ${d.status === 'open' ? 'green' : 'red'}; font-weight: bold;">${d.status === 'open' ? 'เปิดรับ' : 'ปิดแล้ว'}</span></td>
+                                    <td>
+                                        ${d.status === 'open' ? `<button class="action-btn delete-btn" onclick="closeOrderDate('${d.date}')">ปิดรับออเดอร์</button>` : 'ไม่มี'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        async function closeOrderDate(dateToClose) {
+            if (!confirm(`คุณต้องการปิดรับออเดอร์ของวันที่ ${new Date(dateToClose).toLocaleDateString('th-TH')} ใช่หรือไม่?`)) return;
+            const result = await postData({ action: 'closeDate', data: { dateToClose } });
+            if (result.status === 'success') {
+                showNotification(`ส่งคำขอปิดรับออเดอร์แล้ว`, false);
+                const dateObj = orderDates.find(d => new Date(d.date).toISOString().split('T')[0] === new Date(dateToClose).toISOString().split('T')[0]);
+                if (dateObj) {
+                    dateObj.status = 'closed';
+                    renderManageDatesAdmin();
+                }
+            }
+        }
+
+        function renderOrderSummaryAdmin() {
+            const content = document.getElementById('adminContent');
+            const availableDates = [...new Set(orderDates.map(d => d.date))].sort((a, b) => new Date(b) - new Date(a));
+
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>สรุปยอดสั่งซื้อประจำวัน</h3>
+                    <p class="small-text">เลือกวันที่ต้องการดูยอดสรุป ระบบจะรวบรวมสินค้าชนิดเดียวกันจากทุกแผนก</p>
+                    <div class="form-group" style="display: flex; gap: 1rem; align-items: center;">
+                        <select class="form-input" id="summaryDateSelect">
+                            <option value="">-- เลือกวันที่ --</option>
+                            ${availableDates.map(date => `<option value="${date}">${new Date(date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</option>`).join('')}
+                        </select>
+                        <button class="login-btn" style="width: auto; padding: 0.75rem 1.5rem;" onclick="getAndRenderSummary()">ดูสรุป</button>
+                    </div>
+                    <div id="summaryResult"></div>
+                    <div id="printButtonsContainer" class="hidden" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button class="login-btn" onclick="printSummary('consolidated')">🖨️ พิมพ์แบบรวมสินค้า</button>
+                        <button class="login-btn" style="background: #667eea;" onclick="printSummary('department')">🖨️ พิมพ์แบบแยกแผนก</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function getAndRenderSummary() {
+            const selectedDate = document.getElementById('summaryDateSelect').value;
+            const resultDiv = document.getElementById('summaryResult');
+            const printContainer = document.getElementById('printButtonsContainer');
+            
+            if (!selectedDate) {
+                resultDiv.innerHTML = '<p style="color: red;">กรุณาเลือกวันที่</p>';
+                printContainer.classList.add('hidden');
+                return;
+            }
+            resultDiv.innerHTML = '<p>กำลังโหลดข้อมูลสรุป...</p>';
+            printContainer.classList.add('hidden');
+            
+            try {
+                const ordersForDay = await fetchData('Orders', { orderDate: selectedDate });
+                currentSummaryData = ordersForDay; // Store for printing
+
+                if (ordersForDay.length === 0) {
+                    resultDiv.innerHTML = '<p>ไม่พบข้อมูลการสั่งซื้อสำหรับวันที่เลือก</p>';
+                    return;
+                }
+
+                const summary = {};
+                ordersForDay.forEach(order => {
+                    const productId = order.productId;
+                    if (!summary[productId]) {
+                        summary[productId] = { name: order.productName, icon: products.find(p => p.id === productId)?.icon || '📦', totalQuantity: 0, departments: {} };
+                    }
+                    summary[productId].totalQuantity += Number(order.quantity);
+                    const deptName = departments.find(d => d.id === order.department)?.name || order.department;
+                    if (!summary[productId].departments[deptName]) {
+                        summary[productId].departments[deptName] = { qty: 0, remarks: [] };
+                    }
+                    summary[productId].departments[deptName].qty += Number(order.quantity);
+                    if (order.remark) {
+                        summary[productId].departments[deptName].remarks.push(order.remark);
+                    }
+                });
+
+                resultDiv.innerHTML = `
+                    <h4>ยอดสรุปรวมสำหรับวันที่ ${new Date(selectedDate).toLocaleDateString('th-TH')}</h4>
+                    <table class="admin-table" style="margin-top: 1rem;">
+                        <thead><tr><th>สินค้า</th><th style="text-align: right;">จำนวนรวม</th><th>สั่งจากแผนก (จำนวน/หมายเหตุ)</th></tr></thead>
+                        <tbody>
+                            ${Object.values(summary).sort((a,b) => a.name.localeCompare(b.name)).map(item => `
+                                <tr>
+                                    <td>${item.icon} ${item.name}</td>
+                                    <td style="text-align: right; font-weight: bold;">${item.totalQuantity} ${products.find(p=>p.name === item.name)?.unit || ''}</td>
+                                    <td>
+                                        ${Object.entries(item.departments).map(([dept, data]) => `
+                                            <div><b>${dept}:</b> ${data.qty}</div>
+                                            ${data.remarks.length > 0 ? `
+                                                <div style="font-size: 0.8em; color: #666; padding-left: 1rem;">
+                                                    ${data.remarks.map(r => `&bull; ${r}`).join('<br>')}
+                                                </div>
+                                            ` : ''}
+                                        `).join('')}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
+                printContainer.classList.remove('hidden');
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูลสรุป: ${error.message}</p>`;
+            }
+        }
+
+        function printSummary(mode) {
+            if (currentSummaryData.length === 0) {
+                alert('ไม่มีข้อมูลสรุปให้พิมพ์');
+                return;
+            }
+
+            const printArea = document.getElementById('print-area');
+            const selectedDate = document.getElementById('summaryDateSelect').value;
+            let printContent = `<h2>สรุปรายการสั่งซื้อประจำวันที่ ${new Date(selectedDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</h2>`;
+
+            if (mode === 'consolidated') {
+                const summaryTable = document.querySelector('#summaryResult table');
+                if (summaryTable) {
+                    printContent += '<h3>แบบรวมสินค้า</h3>';
+                    printContent += summaryTable.outerHTML;
+                } else {
+                    alert('ไม่พบตารางสรุป');
+                    return;
+                }
+            } else if (mode === 'department') {
+                printContent += '<h3>แบบแยกตามแผนก</h3>';
+                const ordersByDept = {};
+
+                currentSummaryData.forEach(order => {
+                    const deptName = departments.find(d => d.id === order.department)?.name || order.department;
+                    if (!ordersByDept[deptName]) {
+                        ordersByDept[deptName] = [];
+                    }
+                    ordersByDept[deptName].push(order);
+                });
+
+                for (const dept in ordersByDept) {
+                    printContent += `<h4>แผนก: ${dept}</h4>`;
+                    printContent += `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>สินค้า</th>
+                                    <th style="text-align: right;">จำนวน</th>
+                                    <th>หน่วย</th>
+                                    <th>หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${ordersByDept[dept].sort((a,b) => a.productName.localeCompare(b.productName)).map(item => `
+                                    <tr>
+                                        <td>${products.find(p => p.id === item.productId)?.icon || '📦'} ${item.productName}</td>
+                                        <td style="text-align: right;">${item.quantity}</td>
+                                        <td>${item.unit}</td>
+                                        <td>${item.remark || ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            }
+
+            printArea.innerHTML = printContent;
+            window.print();
+        }
+
+        function renderUnitsAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>จัดการหน่วยนับ</h3>
+                    <p class="small-text">เพิ่มหรือลบหน่วยนับที่ใช้ในระบบ การเปลี่ยนแปลงจะมีผลกับ Google Sheet โดยตรง</p>
+                    <div id="unitList">
+                        ${units.map((unit, index) => `
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                <input type="text" class="form-input" value="${unit.name}" onchange="updateLocalUnit(${index}, this.value)">
+                                <button class="action-btn delete-btn" onclick="deleteLocalUnit(${index})">ลบ</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <input type="text" class="form-input" id="newUnitInput" placeholder="เพิ่มหน่วยนับใหม่...">
+                        <button class="add-btn" style="margin-bottom: 0;" onclick="addLocalUnit()">+ เพิ่ม</button>
+                    </div>
+                    <hr style="margin: 2rem 0;">
+                    <button class="login-btn" onclick="saveUnits()">บันทึกการเปลี่ยนแปลงทั้งหมด</button>
+                </div>
+            `;
+        }
+
+        function updateLocalUnit(index, value) {
+            units[index].name = value;
+        }
+
+        function deleteLocalUnit(index) {
+            units.splice(index, 1);
+            renderUnitsAdmin();
+        }
+
+        function addLocalUnit() {
+            const input = document.getElementById('newUnitInput');
+            const newUnitName = input.value.trim();
+            if (newUnitName && !units.some(u => u.name === newUnitName)) {
+                units.push({ name: newUnitName });
+                renderUnitsAdmin();
+            } else {
+                alert('หน่วยนับนี้มีอยู่แล้ว หรือชื่อไม่ถูกต้อง');
+            }
+        }
+
+        async function saveUnits() {
+            if (!confirm('ยืนยันการบันทึกหน่วยนับทั้งหมด? การกระทำนี้จะเขียนทับข้อมูลใน Google Sheet')) return;
+            const result = await postData({ action: 'updateUnits', data: { units } });
+            if (result.status === 'success') {
+                showNotification('บันทึกหน่วยนับเรียบร้อยแล้ว', false);
+            }
+        }
+
+        function renderProductsAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>ข้อมูลสินค้า</h3>
+                    <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
+                    <table class="admin-table">
+                        <thead><tr><th>รหัส</th><th>ชื่อสินค้า</th><th>รายละเอียด</th><th>หน่วยนับ</th><th>หมวดหมู่</th></tr></thead>
+                        <tbody>
+                            ${products.map(product => `
+                                <tr>
+                                    <td>${product.id}</td>
+                                    <td>${product.icon || ''} ${product.name}</td>
+                                    <td>${product.description}</td>
+                                    <td>${product.unit}</td>
+                                    <td>${categories.find(c => c.id === product.category)?.name || product.category}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderDepartmentsAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>ข้อมูลแผนก</h3>
+                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
+                    <table class="admin-table">
+                        <thead><tr><th>รหัส</th><th>ไอคอน</th><th>ชื่อแผนก</th></tr></thead>
+                        <tbody>
+                            ${departments.map(dept => `
+                                <tr>
+                                    <td>${dept.id}</td>
+                                    <td>${dept.icon}</td>
+                                    <td>${dept.name}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderCategoriesAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>ข้อมูลหมวดหมู่</h3>
+                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
+                    <table class="admin-table">
+                        <thead><tr><th>รหัส</th><th>ชื่อหมวดหมู่</th></tr></thead>
+                        <tbody>
+                            ${categories.map(cat => `
+                                <tr>
+                                    <td>${cat.id}</td>
+                                    <td>${cat.name}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderUsersAdmin() {
+            const content = document.getElementById('adminContent');
+            content.innerHTML = `
+                <div class="admin-section">
+                    <h3>ข้อมูลผู้ใช้</h3>
+                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
+                    <table class="admin-table">
+                        <thead><tr><th>รหัส</th><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>สิทธิ์</th></tr></thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${user.username}</td>
+                                    <td>${user.name}</td>
+                                    <td>${user.role === 'admin' ? 'ผู้ดูแล' : 'ผู้ใช้งาน'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            initializeApp();
+        });
+
+        // --- Utility ---
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${isError ? '#ff5252' : '#00d09c'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 25px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                animation: slideUp 0.3s;
+                z-index: 1001;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        window.onclick = function(event) {
+            const cartModal = document.getElementById('cartModal');
+            if (event.target === cartModal) closeCart();
+        }
+    </script>
+</body>
+</html>
