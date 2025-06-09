@@ -441,36 +441,13 @@
             overflow: hidden;
             box-shadow: 0 2px 20px rgba(0,0,0,0.05);
             transition: all 0.3s;
-            cursor: pointer;
-            position: relative; /* Added for badge positioning */
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .product-card .quantity-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #ff5722;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1rem;
-            border: 2px solid white;
-            transition: transform 0.2s ease-in-out;
-            transform: scale(0); /* Hidden by default */
-        }
-
-        .product-card .quantity-badge.visible {
-            transform: scale(1);
         }
 
         .product-image {
@@ -483,10 +460,14 @@
             justify-content: center;
             color: white;
             font-size: 3rem;
+            flex-shrink: 0;
         }
 
         .product-info {
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .product-name {
@@ -500,13 +481,14 @@
             color: #666;
             font-size: 0.9rem;
             margin-bottom: 1rem;
-            min-height: 40px;
+            flex-grow: 1;
         }
 
         .product-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: auto;
         }
 
         .product-unit {
@@ -515,20 +497,32 @@
             color: #00d09c;
         }
 
-        .add-to-cart {
-            background: #00d09c;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
+        .product-quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .add-to-cart:hover {
-            background: #00b386;
-            transform: scale(1.05);
+        .product-quantity-controls .quantity-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .product-quantity-controls .quantity-btn:hover {
+            background: #00d09c;
+            color: white;
+        }
+        .product-quantity-controls .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0.3rem;
         }
 
         /* Cart Modal */
@@ -597,28 +591,6 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .quantity-btn {
-            background: #f0f0f0;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .quantity-btn:hover {
-            background: #00d09c;
-            color: white;
         }
 
         .cart-total {
@@ -827,7 +799,7 @@
 
     <script>
         // --- Google Sheet Integration ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqB1iHxUEd58xH1cfNIoKsTBGXvWJMra7BXM5CY6vRNuwezqGLSNHPHZ51MK23fORR/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby98PSHO1lYX5FpnKErx-XBDF2E2lM-cWzjYT3CdweJ9Pg6YSoF4sy2PvIQAqzucrWy/exec';
 
         // State management
         let currentUser = null;
@@ -849,13 +821,16 @@
 
         // --- Data Communication Functions ---
         function fetchData(sheetName, params = {}) {
+            // For initial load, we don't pass a sheetName
+            const url = sheetName ? `${SCRIPT_URL}?sheet=${sheetName}&${new URLSearchParams(params)}` : SCRIPT_URL;
+
             return new Promise((resolve, reject) => {
                 const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
                 const timer = setTimeout(() => {
                     delete window[callbackName];
                     if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Timeout fetching data from ${sheetName}.`));
-                }, 10000);
+                    reject(new Error(`Timeout fetching data.`));
+                }, 15000); // Increased timeout for bulk load
 
                 window[callbackName] = function(data) {
                     clearTimeout(timer);
@@ -868,14 +843,13 @@
                     }
                 };
 
-                const queryString = new URLSearchParams(params).toString();
                 const script = document.createElement('script');
-                script.src = `${SCRIPT_URL}?sheet=${sheetName}&callback=${callbackName}&${queryString}`;
+                script.src = `${url}&callback=${callbackName}`;
                 script.onerror = () => {
                     clearTimeout(timer);
                     delete window[callbackName];
                     if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Error fetching data from ${sheetName} via JSONP.`));
+                    reject(new Error(`Error fetching data via JSONP.`));
                 };
                 document.body.appendChild(script);
             });
@@ -907,13 +881,15 @@
             loginBox.querySelector('.login-title').textContent = 'กำลังโหลดข้อมูล...';
 
             try {
-                const dataPromises = [
-                    fetchData('Users'), fetchData('Departments'), fetchData('Categories'),
-                    fetchData('Products'), fetchData('OrderDates'), fetchData('Units')
-                ];
-                [users, departments, categories, products, orderDates, units] = await Promise.all(dataPromises);
+                const allData = await fetchData(); // Single call for all data
+                users = allData.users;
+                departments = allData.departments;
+                categories = allData.categories;
+                products = allData.products;
+                orderDates = allData.orderDates;
+                units = allData.units;
                 
-                console.log("All data fetched and stored.");
+                console.log("All data fetched and stored in a single request.");
                 loginBox.querySelector('.login-title').textContent = originalTitle;
                 document.getElementById('loginPage').classList.remove('hidden');
                 document.getElementById('mainApp').classList.add('hidden');
@@ -1089,17 +1065,18 @@
                 const quantity = itemInCart ? itemInCart.quantity : 0;
 
                 return `
-                <div class="product-card" onclick="addToCart(${product.id})">
-                    <div class="quantity-badge ${quantity > 0 ? 'visible' : ''}" id="badge-${product.id}">${quantity}</div>
+                <div class="product-card">
                     <div class="product-image">${product.icon || '📦'}</div>
                     <div class="product-info">
                         <div class="product-name">${product.name}</div>
                         <div class="product-description">${product.description}</div>
                         <div class="product-footer">
                             <div class="product-unit">${product.unit || 'N/A'}</div>
-                            <button class="add-to-cart" onclick="event.stopPropagation(); addToCart(${product.id})">
-                                เพิ่มลงตะกร้า
-                            </button>
+                            <div class="product-quantity-controls">
+                                <button class="quantity-btn" onclick="updateProductQuantity(${product.id}, -1)">-</button>
+                                <input type="number" class="quantity-input" value="${quantity}" min="0" onchange="setProductQuantity(${product.id}, this.value)">
+                                <button class="quantity-btn" onclick="updateProductQuantity(${product.id}, 1)">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1107,27 +1084,43 @@
         }
 
         // --- Cart and Checkout ---
-        function addToCart(productId) {
+        function updateProductQuantity(productId, change) {
             if (!selectedOrderDate) {
                 alert('กรุณาเลือกวันที่สั่งซื้อก่อน');
                 return;
             }
-            if (!selectedDepartment) {
-                alert('เกิดข้อผิดพลาด: ไม่พบแผนกของคุณ กรุณาล็อกอินใหม่อีกครั้ง');
+            let itemInCart = cart.find(item => item.id === productId);
+            let currentQuantity = itemInCart ? itemInCart.quantity : 0;
+            let newQuantity = Math.max(0, currentQuantity + change);
+            
+            setProductQuantity(productId, newQuantity);
+        }
+
+        function setProductQuantity(productId, newQuantity) {
+            if (!selectedOrderDate) {
+                alert('กรุณาเลือกวันที่สั่งซื้อก่อน');
                 return;
             }
-            
-            const product = products.find(p => p.id === productId);
-            const existingItem = cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                existingItem.quantity++;
+            newQuantity = parseInt(newQuantity, 10);
+            if (isNaN(newQuantity) || newQuantity < 0) {
+                newQuantity = 0;
+            }
+
+            let itemInCart = cart.find(item => item.id === productId);
+
+            if (newQuantity > 0) {
+                if (itemInCart) {
+                    itemInCart.quantity = newQuantity;
+                } else {
+                    const product = products.find(p => p.id === productId);
+                    cart.push({ ...product, department: selectedDepartment, quantity: newQuantity, remark: '' });
+                }
             } else {
-                cart.push({ ...product, department: selectedDepartment, quantity: 1, remark: '' });
+                // Remove from cart if quantity is 0
+                cart = cart.filter(item => item.id !== productId);
             }
             
             updateCartCount();
-            showNotification('เพิ่มสินค้าลงตะกร้าแล้ว');
             renderProducts();
         }
 
@@ -1174,12 +1167,11 @@
                         <input type="text" class="form-input" style="margin-top: 0.5rem;" placeholder="เพิ่มหมายเหตุ..." value="${item.remark || ''}" onchange="updateRemark(${index}, this.value)">
                     </div>
                     <div class="cart-item-controls">
-                        <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        <div class="product-quantity-controls">
+                            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, -1)">-</button>
+                            <input type="number" class="quantity-input" value="${item.quantity}" min="0" onchange="setCartItemQuantity(${index}, this.value)">
+                            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, 1)">+</button>
                         </div>
-                        <div style="font-weight: bold;">${item.unit}</div>
                     </div>
                 </div>
             `).join('');
@@ -1189,11 +1181,23 @@
             cart[index].remark = value;
         }
 
-        function updateQuantity(index, change) {
-            cart[index].quantity += change;
-            if (cart[index].quantity <= 0) {
+        function updateCartItemQuantity(index, change) {
+            let newQuantity = Math.max(0, cart[index].quantity + change);
+            setCartItemQuantity(index, newQuantity);
+        }
+
+        function setCartItemQuantity(index, newQuantity) {
+            newQuantity = parseInt(newQuantity, 10);
+            if (isNaN(newQuantity) || newQuantity < 0) {
+                newQuantity = 0;
+            }
+
+            if (newQuantity > 0) {
+                cart[index].quantity = newQuantity;
+            } else {
                 cart.splice(index, 1);
             }
+            
             updateCartCount();
             renderCart();
             renderProducts();
