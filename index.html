@@ -757,13 +757,11 @@
                 </div>
 
                 <div id="departmentSection" class="department-section hidden">
-                    <h2>2. เลือกแผนกของคุณ</h2>
-                    <div class="department-grid" id="departmentGrid">
-                        <!-- Departments will be dynamically inserted here -->
-                    </div>
+                    <!-- This section is now bypassed -->
                 </div>
 
                 <div id="categorySection" class="hidden">
+                    <h2>2. เลือกสินค้า</h2>
                     <div class="category-tabs" id="categoryTabs">
                         <!-- Categories will be dynamically inserted here -->
                     </div>
@@ -926,9 +924,11 @@
 
             if (user) {
                 currentUser = user;
+                selectedDepartment = user.department; // Set department automatically
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('currentUser').textContent = user.name;
+                const deptName = departments.find(d => d.id === user.department)?.name || 'ไม่พบแผนก';
+                document.getElementById('currentUser').textContent = `${user.name} (${deptName})`;
                 
                 if (user.role === 'admin') {
                     document.getElementById('adminBtn').classList.remove('hidden');
@@ -958,7 +958,7 @@
             cart = [];
             updateCartCount();
             selectedOrderDate = null;
-            selectedDepartment = '';
+            selectedDepartment = currentUser ? currentUser.department : ''; // Keep department on reset
             selectedCategory = 'all';
             document.getElementById('departmentSection').classList.add('hidden');
             document.getElementById('categorySection').classList.add('hidden');
@@ -1007,27 +1007,18 @@
             selectedOrderDate = date;
             document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
-            document.getElementById('departmentSection').classList.remove('hidden');
-            renderDepartments();
-        }
-
-        function renderDepartments() {
-            const grid = document.getElementById('departmentGrid');
-            grid.innerHTML = departments.map(dept => `
-                <button class="dept-card" onclick="selectDepartment(this, '${dept.id}')">
-                    <div>${dept.icon}</div>
-                    <div>${dept.name}</div>
-                </button>
-            `).join('');
-        }
-
-        function selectDepartment(element, deptId) {
-            selectedDepartment = deptId;
-            document.querySelectorAll('#departmentGrid .dept-card').forEach(card => card.classList.remove('active'));
-            element.classList.add('active');
+            
+            // Bypass department selection and go straight to products
             document.getElementById('categorySection').classList.remove('hidden');
+            if(document.getElementById('searchInput')) {
+                document.getElementById('searchInput').value = ''; // Clear search
+            }
             renderProducts();
         }
+
+        // renderDepartments and selectDepartment are no longer needed in the user flow
+        function renderDepartments() { /* Deprecated */ }
+        function selectDepartment() { /* Deprecated */ }
 
         function renderCategories() {
             const tabs = document.getElementById('categoryTabs');
@@ -1094,12 +1085,13 @@
                 return;
             }
             if (!selectedDepartment) {
-                alert('กรุณาเลือกแผนกก่อน');
+                alert('เกิดข้อผิดพลาด: ไม่พบแผนกของคุณ กรุณาล็อกอินใหม่อีกครั้ง');
                 return;
             }
             
             const product = products.find(p => p.id === productId);
-            const existingItem = cart.find(item => item.id === productId && item.department === selectedDepartment);
+            // Department is now fixed per user, so we don't need to check it in the cart find logic
+            const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
                 existingItem.quantity++;
