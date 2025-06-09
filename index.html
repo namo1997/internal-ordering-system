@@ -723,7 +723,7 @@
     <div id="mainApp" class="hidden">
         <header class="header">
             <div class="header-content">
-                <div class="logo">
+                <div class="logo" onclick="goHome()" style="cursor: pointer;" title="กลับไปหน้าแรก">
                     <span>📦</span>
                     <span>ระบบสั่งของภายใน</span>
                 </div>
@@ -766,6 +766,10 @@
                 <div id="categorySection" class="hidden">
                     <div class="category-tabs" id="categoryTabs">
                         <!-- Categories will be dynamically inserted here -->
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <input type="text" class="form-input" id="searchInput" placeholder="🔍 ค้นหาชื่อสินค้า...">
                     </div>
 
                     <div class="products-grid" id="productsGrid">
@@ -963,6 +967,18 @@
             }
         }
 
+        function goHome() {
+            const adminPanel = document.getElementById('adminPanel');
+            const orderSection = document.getElementById('orderSection');
+            if (adminPanel.style.display === 'block') {
+                adminPanel.style.display = 'none';
+                orderSection.style.display = 'block';
+            }
+            
+            resetOrderState();
+            renderOrderDates();
+        }
+
         // --- User Ordering Flow ---
         function renderOrderDates() {
             const grid = document.getElementById('orderDateGrid');
@@ -1032,12 +1048,20 @@
 
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
-            const filteredProducts = selectedCategory === 'all' 
-                ? products 
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            let filteredProducts = selectedCategory === 'all'
+                ? products
                 : products.filter(p => p.category === selectedCategory);
+
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(p =>
+                    p.name.toLowerCase().includes(searchTerm)
+                );
+            }
             
             if (filteredProducts.length === 0) {
-                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่พบสินค้าในหมวดหมู่นี้</p>`;
+                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่พบสินค้าที่ตรงกับการค้นหา</p>`;
                 return;
             }
 
@@ -1546,6 +1570,7 @@
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
             }
+            document.getElementById('searchInput').addEventListener('input', renderProducts);
             initializeApp();
         });
 
