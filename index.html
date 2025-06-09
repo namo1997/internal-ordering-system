@@ -990,7 +990,6 @@
             const grid = document.getElementById('orderDateGrid');
             const openDates = orderDates.filter(d => d.status === 'open');
             
-            // Fetch user's existing orders for open dates
             const userOrders = await fetchData('Orders', { userId: currentUser.id });
 
             grid.innerHTML = [...openDates]
@@ -1072,9 +1071,9 @@
             const grid = document.getElementById('productsGrid');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-            let filteredProducts = selectedCategory === 'all' 
-                ? products 
-                : products.filter(p => p.category === selectedCategory);
+            let filteredProducts = selectedCategory === 'all'
+                ? products
+                : products.filter(p => p.category && p.category.trim().toLowerCase() === selectedCategory.toLowerCase());
 
             if (searchTerm) {
                 filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
