@@ -3,37 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="th">
     <title>ระบบสั่งของภายในองค์กร</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* Global Styles */
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f6fa;
         }
 
         /* Login Page */
         .login-container {
-            min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
         }
 
         .login-box {
             background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            width: 90%;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 100%;
             max-width: 400px;
-            animation: slideUp 0.5s ease-out;
+            animation: slideUp 0.3s ease-out;
         }
 
         .login-logo {
@@ -44,387 +48,110 @@
 
         .login-title {
             text-align: center;
-            font-size: 1.5rem;
+            color: #2c3e50;
             margin-bottom: 2rem;
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #00d09c;
-            box-shadow: 0 0 0 3px rgba(0,208,156,0.1);
         }
 
         .login-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+            background: #00d09c;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .login-btn:hover {
+            background: #00b386;
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
         }
 
         .error-message {
-            background: #ff5252;
-            color: white;
-            padding: 0.75rem;
-            border-radius: 8px;
+            color: #ff5252;
             margin-bottom: 1rem;
             text-align: center;
             display: none;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+        /* Notification */
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
             color: white;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s;
-        }
-
-        .nav-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .cart-count {
-            background: #ff5722;
-            padding: 0.2rem 0.5rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        /* Admin Panel */
-        .admin-panel {
+            z-index: 1000;
             display: none;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .admin-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
-            flex-wrap: wrap;
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
         }
 
-        .admin-tab {
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            color: #666;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .admin-tab.active {
-            color: #00d09c;
-        }
-
-        .admin-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #00d09c;
-        }
-
-        .admin-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-        }
-        
-        .admin-section h3 {
+        .form-label {
+            display: block;
             margin-bottom: 0.5rem;
-        }
-        
-        .admin-section .small-text {
-            margin-bottom: 1.5rem;
-            color: #666;
-            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        /* Table Styles */
-        .admin-table {
+        .form-input {
             width: 100%;
-            border-collapse: collapse;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        .admin-table th,
-        .admin-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+        .form-input:focus {
+            outline: none;
+            border-color: #00d09c;
+            box-shadow: 0 0 0 3px rgba(0,208,156,0.2);
         }
 
-        .admin-table th {
-            background: #f5f5f5;
-            font-weight: 600;
-            color: #666;
-        }
-
-        .admin-table tr:hover {
-            background: #f9f9f9;
-        }
-
+        /* Buttons */
         .action-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            margin-right: 0.5rem;
-        }
-
-        .edit-btn {
-            background: #2196F3;
-            color: white;
-        }
-
-        .edit-btn:hover {
-            background: #1976D2;
-        }
-
-        .delete-btn {
-            background: #f44336;
-            color: white;
-        }
-
-        .delete-btn:hover {
-            background: #d32f2f;
-        }
-
-        .add-btn {
             background: #00d09c;
             color: white;
-            padding: 0.75rem 1.5rem;
             border: none;
+            padding: 0.75rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
+            font-weight: 600;
             transition: all 0.3s;
         }
 
-        .add-btn:hover {
+        .action-btn:hover {
             background: #00b386;
             transform: translateY(-2px);
         }
 
-        /* Modal for Add/Edit */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 300;
-            animation: fadeIn 0.3s;
-        }
-
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 500px;
-            margin: 2rem auto;
-            border-radius: 15px;
-            padding: 2rem;
-            animation: slideUp 0.3s;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .close-modal {
-            background: none;
+        .delete-btn {
+            background: #ff5252;
+            color: white;
             border: none;
-            font-size: 2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             cursor: pointer;
-            color: #666;
-        }
-
-        /* Department Section */
-        .department-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-        }
-
-        .department-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .dept-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 1rem;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
+            font-size: 0.9rem;
             transition: all 0.3s;
-            border: none;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: 500;
-            position: relative;
         }
 
-        .dept-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .dept-card.active {
-            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
-        }
-
-        .dept-card .edit-order-btn {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.3);
-            color: white;
-            border: 1px solid white;
-            border-radius: 15px;
-            padding: 0.3rem 0.8rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
-        /* Category Tabs */
-        .category-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
-
-        .category-tab {
-            background: white;
-            border: 2px solid #e0e0e0;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .category-tab:hover {
-            border-color: #00d09c;
-            transform: translateY(-2px);
-        }
-
-        .category-tab.active {
-            background: #00d09c;
-            color: white;
-            border-color: #00d09c;
+        .delete-btn:hover {
+            background: #ff1a1a;
         }
 
         /* Product Grid */
@@ -432,259 +159,590 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-top: 1.5rem;
         }
 
         .product-card {
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .product-image {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            flex-shrink: 0;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .product-name {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .product-card h3 {
             margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .product-description {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            flex-grow: 1;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
+            font-size: 1.2rem;
         }
 
         .product-unit {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #00d09c;
+            color: #666;
+            margin-bottom: 1rem;
         }
 
-        .product-quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* Order Dates Grid */
+        .order-dates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
-        .product-quantity-controls .quantity-btn {
-            background: #f0f0f0;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+        .order-date-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
             cursor: pointer;
-            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: all 0.3s;
         }
-        .product-quantity-controls .quantity-btn:hover {
+
+        .order-date-card:hover:not(.closed) {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .order-date-card.selected {
+            border: 2px solid #00d09c;
+        }
+
+        .order-date-card.closed {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            background: none;
+            border: 2px solid #00d09c;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #00d09c;
+            transition: all 0.3s;
+        }
+
+        .category-tab:hover {
+            background: rgba(0,208,156,0.1);
+        }
+
+        .category-tab.active {
             background: #00d09c;
             color: white;
         }
-        .product-quantity-controls .quantity-input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 0.3rem;
-        }
 
-        /* Cart Modal */
-        .cart-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            animation: fadeIn 0.3s;
-        }
-
-        .cart-content {
+        /* Admin Section */
+        .admin-section {
             background: white;
-            width: 90%;
-            max-width: 600px;
-            margin: 2rem auto;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 2rem;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+        .admin-section h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
         }
 
-        .close-cart {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #666;
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            overflow-x: auto;
         }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .summary-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th,
+        .summary-table td {
             padding: 1rem;
-            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+            border-bottom: 1px solid #eee;
         }
 
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-name {
+        .summary-table th {
+            background: #f8f9fa;
             font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .cart-item-dept {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .cart-total {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 2px solid #e0e0e0;
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        .checkout-btn {
-            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .checkout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
 
         @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Hidden class */
-        .hidden {
-            display: none !important;
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* Print Styles */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            #print-area table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 12pt;
-                margin-top: 1rem;
-            }
-            #print-area th, #print-area td {
-                border: 1px solid #ccc;
-                padding: 8px;
-                text-align: left;
-            }
-            #print-area h2, #print-area h3, #print-area h4 {
-                margin-bottom: 1rem;
-                color: #000;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .department-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-            
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-            
-            .admin-tabs {
-                flex-wrap: wrap;
-            }
-            
-            .admin-table {
-                font-size: 0.9rem;
+            .no-print {
+                display: none !important;
             }
         }
     </style>
+    
+    <!-- เพิ่ม Google Sheets API -->
+    <script>
+        // ฟังก์ชันสำหรับเชื่อมต่อกับ Google Sheets
+        async function fetchDataFromSheet() {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    mode: 'cors',
+                });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+        }
+
+        // ฟังก์ชันสำหรับบันทึกข้อมูลลง Google Sheets
+        async function saveDataToSheet(data) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                throw error;
+            }
+        }
+
+        // --- Google Sheet Integration ---
+        const SCRIPT_URL = 'YOUR_DEPLOYED_SCRIPT_URL_HERE';
+
+        // State management
+        let currentUser = null;
+        let selectedOrderDate = null;
+        let selectedDepartment = '';
+        let selectedCategory = 'all';
+        let cart = [];
+        let activeAdminTab = 'manageDates';
+        let currentSummaryData = [];
+        let existingOrderId = null;
+
+        // Data stores
+        window.users = [];
+        window.departments = [];
+        window.categories = [];
+        window.products = [];
+        window.orderDates = [];
+        window.units = [];
+
+        // --- API Functions ---
+        async function fetchData(action, params = {}) {
+            const queryParams = new URLSearchParams({
+                action,
+                ...params
+            }).toString();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${queryParams}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update local data stores if appropriate
+                if (action === 'getData') {
+                    if (data.users) users = data.users;
+                    if (data.departments) departments = data.departments;
+                    if (data.categories) categories = data.categories;
+                    if (data.products) products = data.products;
+                    if (data.orderDates) orderDates = data.orderDates;
+                    if (data.units) units = data.units;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showNotification(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        async function postData(action, payload) {
+            showNotification('กำลังดำเนินการ...', false);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...payload
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // On success, refresh the relevant data
+                if (['addOrder', 'updateOrder', 'deleteOrder'].includes(action)) {
+                    await loadOrderDates();
+                } else if (['addProduct', 'updateProduct', 'deleteProduct'].includes(action)) {
+                    await loadProducts();
+                }
+                
+                // Show success message
+                showNotification(data.message || 'ดำเนินการเรียบร้อย');
+                return data;
+            } catch (error) {
+                console.error('Error posting data:', error);
+                showNotification(`เกิดข้อผิดพลาด: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        // --- Data Loading Functions ---
+        async function loadInitialData() {
+            try {
+                const data = await fetchData('getData');
+                renderUI();
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        async function loadOrderDates() {
+            try {
+                const data = await fetchData('getOrderDates');
+                if (data.orderDates) {
+                    orderDates = data.orderDates;
+                    renderOrderDates();
+                }
+            } catch (error) {
+                console.error('Error loading order dates:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const data = await fetchData('getProducts');
+                if (data.products) {
+                    products = data.products;
+                    renderProducts();
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // --- Authentication Functions ---
+        async function login(username) {
+            try {
+                const response = await fetchData('login', { username });
+                const user = response.user;
+                
+                if (!user) {
+                    throw new Error('ไม่พบข้อมูลผู้ใช้');
+                }
+                
+                // Store user info
+                window.currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                updateUIForLoggedInUser();
+                showNotification('เข้าสู่ระบบสำเร็จ');
+                
+                // Load initial data
+                await loadInitialData();
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, true);
+            }
+        }
+
+        function logout() {
+            // Clear user data
+            window.currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            
+            // Clear all data stores
+            window.users = [];
+            window.departments = [];
+            window.categories = [];
+            window.products = [];
+            window.orderDates = [];
+            window.units = [];
+            window.cart = [];
+            
+            // Reset UI state
+            window.selectedOrderDate = null;
+            window.selectedDepartment = '';
+            window.selectedCategory = 'all';
+            window.activeAdminTab = 'manageDates';
+            
+            // Update UI
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminBtn').classList.add('hidden');
+            
+            showNotification('ออกจากระบบสำเร็จ');
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('currentUser').textContent = window.currentUser.name;
+            
+            // Show admin button for admin users
+            if (window.currentUser.isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+            }
+        }
+
+        // --- Utility Functions ---
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.backgroundColor = isError ? '#ff5252' : '#4caf50';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // --- UI Rendering Functions ---
+        function renderUI() {
+            // แสดงหน้าหลักหลังจาก login
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // เรียกใช้ฟังก์ชันแสดงผลต่างๆ
+            renderOrderDates();
+            renderCategories();
+            updateCartCount();
+        }
+
+        function renderOrderDates() {
+            const orderDateGrid = document.getElementById('orderDateGrid');
+            orderDateGrid.innerHTML = '';
+            
+            if (!window.orderDates || window.orderDates.length === 0) {
+                orderDateGrid.innerHTML = '<p class="empty-message">ไม่มีวันที่สั่งซื้อที่เปิดรับ</p>';
+                return;
+            }
+            
+            window.orderDates.forEach(date => {
+                const card = document.createElement('div');
+                card.className = 'order-date-card';
+                if (date.date === window.selectedOrderDate) {
+                    card.classList.add('selected');
+                }
+                if (date.closed) {
+                    card.classList.add('closed');
+                }
+                
+                card.dataset.date = date.date;
+                card.innerHTML = `
+                    <div class="date-info">
+                        <div class="date">${formatDate(date.date)}</div>
+                        <div class="status">${date.closed ? '🔒 ปิดรับออเดอร์' : '🔓 เปิดรับออเดอร์'}</div>
+                    </div>
+                    ${date.hasOwnProperty('orderCount') ? `
+                        <div class="order-count">
+                            จำนวนออเดอร์: ${date.orderCount}
+                        </div>
+                    ` : ''}
+                    ${window.currentUser?.isAdmin ? `
+                        <div class="admin-controls">
+                            <button onclick="closeOrderDate('${date.date}')" class="action-btn" ${date.closed ? 'disabled' : ''}>
+                                ${date.closed ? 'ปิดแล้ว' : 'ปิดรับออเดอร์'}
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // เพิ่ม event listener สำหรับการคลิกเลือกวันที่
+                if (!date.closed) {
+                    card.addEventListener('click', () => selectOrderDate(date.date));
+                }
+                
+                orderDateGrid.appendChild(card);
+            });
+        }
+
+        function renderCategories() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            categoryTabs.innerHTML = `
+                <button class="category-tab ${window.selectedCategory === 'all' ? 'active' : ''}" 
+                        onclick="selectCategory('all')">
+                    ทั้งหมด
+                </button>
+            `;
+            
+            window.categories.forEach(category => {
+                categoryTabs.innerHTML += `
+                    <button class="category-tab ${window.selectedCategory === category.id ? 'active' : ''}"
+                            onclick="selectCategory('${category.id}')">
+                        ${category.name}
+                    </button>
+                `;
+            });
+        }
+
+        function renderUnits() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการหน่วยนับ</h2>
+                    <div class="form-group">
+                        <label>เพิ่มหน่วยนับใหม่</label>
+                        <input type="text" id="newUnitInput" class="form-input" placeholder="ระบุชื่อหน่วยนับ">
+                        <button onclick="addUnit()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="units-list">
+                        ${window.units.map(unit => `
+                            <div class="unit-item">
+                                <span>${unit.name}</span>
+                                <button onclick="deleteUnit('${unit.id}')" class="delete-btn">ลบ</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductManagement() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการสินค้า</h2>
+                    <div class="form-group">
+                        <label>เพิ่มสินค้าใหม่</label>
+                        <input type="text" id="newProductName" class="form-input" placeholder="ชื่อสินค้า">
+                        <select id="productCategory" class="form-input">
+                            ${window.categories.map(cat => 
+                                `<option value="${cat.id}">${cat.name}</option>`
+                            ).join('')}
+                        </select>
+                        <select id="productUnit" class="form-input">
+                            ${window.units.map(unit => 
+                                `<option value="${unit.id}">${unit.name}</option>`
+                            ).join('')}
+                        </select>
+                        <button onclick="addProduct()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="products-list">
+                        ${window.products.map(product => `
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <span class="product-name">${product.name}</span>
+                                    <span class="product-category">${getCategoryName(product.category)}</span>
+                                    <span class="product-unit">${getUnitName(product.unit)}</span>
+                                </div>
+                                <div class="product-controls">
+                                    <button onclick="editProduct('${product.id}')" class="edit-btn">แก้ไข</button>
+                                    <button onclick="deleteProduct('${product.id}')" class="delete-btn">ลบ</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Helper Functions ---
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('th-TH', options);
+        }
+
+        function getCategoryName(categoryId) {
+            const category = window.categories.find(c => c.id === categoryId);
+            return category ? category.name : 'ไม่ระบุหมวดหมู่';
+        }
+
+        function getUnitName(unitId) {
+            const unit = window.units.find(u => u.id === unitId);
+            return unit ? unit.name : 'ไม่ระบุหน่วย';
+        }
+
+        function selectCategory(categoryId) {
+            window.selectedCategory = categoryId;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('onclick').includes(categoryId));
+            });
+            renderProducts();
+        }
+
+        // เพิ่มฟังก์ชัน goHome
+        function goHome() {
+            // ซ่อน admin panel ถ้ากำลังแสดงอยู่
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('orderSection').style.display = 'block';
+            
+            // รีเซ็ตการเลือกวันที่และหมวดหมู่
+            window.selectedOrderDate = null;
+            window.selectedCategory = 'all';
+            
+            // อัพเดท UI
+            renderUI();
+        }
+    </script>
 </head>
 <body>
     <!-- Login Page -->
@@ -720,7 +778,7 @@
                         <span>👤</span>
                         <span id="currentUser">User</span>
                     </div>
-                    <button class="nav-btn" onclick="openCart()">
+                    <button class="nav-btn" onclick="openCart()"></button>
                         <span>🛒 ตะกร้า</span>
                         <span class="cart-count" id="cartCount">0</span>
                     </button>
@@ -799,872 +857,398 @@
 
     <script>
         // --- Google Sheet Integration ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpICde0Ls-0yfmDxVp5MOcKlTE07c9uh6ohbxAwsPxAJ_HJsg8b3JzbMsIDQjLlg2W/exec';
+        window.SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdE0SwXv0Jb7d1IDD4XPRghdPhsrkqK1MQ_oueyqP4wdEakTJr3c3BoCVJaWihPwG-/exec';
+        window.SPREADSHEET_ID = '1k3g208t8UhaRC5Gig5oht7KpUVWTbtWPJmzAVEgYFWU';
 
         // State management
-        let currentUser = null;
-        let selectedOrderDate = null;
-        let selectedDepartment = '';
-        let selectedCategory = 'all';
-        let cart = [];
-        let activeAdminTab = 'manageDates';
-        let currentSummaryData = [];
-        let existingOrderId = null;
+        window.currentUser = null;
+        window.selectedOrderDate = null;
+        window.selectedDepartment = '';
+        window.selectedCategory = 'all';
+        window.cart = [];
+        window.activeAdminTab = 'manageDates';
+        window.currentSummaryData = [];
+        window.existingOrderId = null;
 
         // Data stores
-        let users = [];
-        let departments = [];
-        let categories = [];
+        window.users = [];
+        window.departments = [];
+        window.categories = [];
         let products = [];
         let orderDates = [];
         let units = [];
 
-        // --- Data Communication Functions ---
-        function fetchData(sheetName, params = {}) {
-            return new Promise((resolve, reject) => {
-                const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
-                const timer = setTimeout(() => {
-                    delete window[callbackName];
-                    if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Timeout fetching data from ${sheetName || 'initial load'}.`));
-                }, 15000);
-
-                window[callbackName] = function(data) {
-                    clearTimeout(timer);
-                    delete window[callbackName];
-                    if (script.parentNode) document.body.removeChild(script);
-                    if (data.error) {
-                        reject(new Error(data.error));
-                    } else {
-                        resolve(data);
-                    }
-                };
-
-                const allParams = { ...params, callback: callbackName };
-                if (sheetName) {
-                    allParams.sheet = sheetName;
+        // --- API Functions ---
+        async function fetchData(action, params = {}) {
+            const queryParams = new URLSearchParams({
+                action,
+                ...params
+            }).toString();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${queryParams}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const queryString = new URLSearchParams(allParams).toString();
-                const script = document.createElement('script');
-                script.src = `${SCRIPT_URL}?${queryString}`;
-                script.onerror = () => {
-                    clearTimeout(timer);
-                    delete window[callbackName];
-                    if (script.parentNode) document.body.removeChild(script);
-                    reject(new Error(`Error fetching data from ${sheetName || 'initial load'} via JSONP.`));
-                };
-                document.body.appendChild(script);
-            });
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update local data stores if appropriate
+                if (action === 'getData') {
+                    if (data.users) users = data.users;
+                    if (data.departments) departments = data.departments;
+                    if (data.categories) categories = data.categories;
+                    if (data.products) products = data.products;
+                    if (data.orderDates) orderDates = data.orderDates;
+                    if (data.units) units = data.units;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showNotification(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`, true);
+                throw error;
+            }
         }
 
-        async function postData(payload) {
-            showNotification('กำลังส่งข้อมูล...', false);
+        async function postData(action, payload) {
+            showNotification('กำลังดำเนินการ...', false);
             try {
-                await fetch(SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...payload
+                    })
                 });
-                return { status: 'success' };
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // On success, refresh the relevant data
+                if (['addOrder', 'updateOrder', 'deleteOrder'].includes(action)) {
+                    await loadOrderDates();
+                } else if (['addProduct', 'updateProduct', 'deleteProduct'].includes(action)) {
+                    await loadProducts();
+                }
+                
+                // Show success message
+                showNotification(data.message || 'ดำเนินการเรียบร้อย');
+                return data;
             } catch (error) {
                 console.error('Error posting data:', error);
-                showNotification('เกิดข้อผิดพลาดในการส่งข้อมูล', true);
-                return { status: 'error', message: error.message };
+                showNotification(`เกิดข้อผิดพลาด: ${error.message}`, true);
+                throw error;
             }
         }
 
-        // --- Initialization and Login Flow ---
-        async function initializeApp() {
-            console.log("Initializing app and fetching data...");
-            const loginBox = document.querySelector('.login-box');
-            const originalTitle = loginBox.querySelector('.login-title').textContent;
-            loginBox.querySelector('.login-title').textContent = 'กำลังโหลดข้อมูล...';
-
+        // --- Data Loading Functions ---
+        async function loadInitialData() {
             try {
-                const allData = await fetchData(); // Single call for all data
-                users = allData.users;
-                departments = allData.departments;
-                categories = allData.categories;
-                products = allData.products;
-                orderDates = allData.orderDates;
-                units = allData.units;
-                
-                console.log("All data fetched and stored in a single request.");
-                loginBox.querySelector('.login-title').textContent = originalTitle;
-                document.getElementById('loginPage').classList.remove('hidden');
-                document.getElementById('mainApp').classList.add('hidden');
+                const data = await fetchData('getData');
+                renderUI();
             } catch (error) {
-                loginBox.querySelector('.login-title').textContent = 'เกิดข้อผิดพลาดในการโหลด';
-                showNotification(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`, true);
+                console.error('Error loading initial data:', error);
             }
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const user = users.find(u => u.username === username && u.password.toString() === password);
+        async function loadOrderDates() {
+            try {
+                const data = await fetchData('getOrderDates');
+                if (data.orderDates) {
+                    orderDates = data.orderDates;
+                    renderOrderDates();
+                }
+            } catch (error) {
+                console.error('Error loading order dates:', error);
+            }
+        }
 
-            if (user) {
-                currentUser = user;
-                selectedDepartment = user.department;
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                const deptName = departments.find(d => d.id === user.department)?.name || 'ไม่พบแผนก';
-                document.getElementById('currentUser').textContent = `${user.name} (${deptName})`;
+        async function loadProducts() {
+            try {
+                const data = await fetchData('getProducts');
+                if (data.products) {
+                    products = data.products;
+                    renderProducts();
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // --- Authentication Functions ---
+        async function login(username) {
+            try {
+                const response = await fetchData('login', { username });
+                const user = response.user;
                 
-                if (user.role === 'admin') {
-                    document.getElementById('adminBtn').classList.remove('hidden');
+                if (!user) {
+                    throw new Error('ไม่พบข้อมูลผู้ใช้');
                 }
                 
-                renderOrderDates();
-                renderCategories();
-            } else {
-                const errorDiv = document.getElementById('loginError');
-                errorDiv.textContent = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
-                errorDiv.style.display = 'block';
+                // Store user info
+                window.currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                updateUIForLoggedInUser();
+                showNotification('เข้าสู่ระบบสำเร็จ');
+                
+                // Load initial data
+                await loadInitialData();
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, true);
             }
         }
 
         function logout() {
-            currentUser = null;
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('loginError').style.display = 'none';
+            // Clear user data
+            window.currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            
+            // Clear all data stores
+            window.users = [];
+            window.departments = [];
+            window.categories = [];
+            window.products = [];
+            window.orderDates = [];
+            window.units = [];
+            window.cart = [];
+            
+            // Reset UI state
+            window.selectedOrderDate = null;
+            window.selectedDepartment = '';
+            window.selectedCategory = 'all';
+            window.activeAdminTab = 'manageDates';
+            
+            // Update UI
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
             document.getElementById('adminBtn').classList.add('hidden');
-            resetOrderState();
-        }
-        
-        function resetOrderState() {
-            cart = [];
-            updateCartCount();
-            selectedOrderDate = null;
-            selectedDepartment = currentUser ? currentUser.department : '';
-            selectedCategory = 'all';
-            existingOrderId = null;
-            document.getElementById('categorySection').classList.add('hidden');
-            if (document.getElementById('productsGrid')) {
-                renderProducts();
-            }
-        }
-
-        function goHome() {
-            const adminPanel = document.getElementById('adminPanel');
-            const orderSection = document.getElementById('orderSection');
-            if (adminPanel.style.display === 'block') {
-                adminPanel.style.display = 'none';
-                orderSection.style.display = 'block';
-            }
-            resetOrderState();
-            renderOrderDates();
-        }
-
-        // --- User Ordering Flow ---
-        async function renderOrderDates() {
-            const grid = document.getElementById('orderDateGrid');
-            const openDates = orderDates.filter(d => d.status === 'open');
             
-            const userOrders = await fetchData('Orders', { userId: currentUser.id });
-
-            grid.innerHTML = [...openDates]
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .map(d => {
-                    const hasOrder = userOrders.some(o => o.orderDate === d.date);
-                    return `
-                    <button class="dept-card" onclick="selectOrderDate(this, '${d.date}')">
-                        <div>📅</div>
-                        <div>${new Date(d.date).toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                        ${hasOrder ? `<div class="edit-order-btn" onclick="event.stopPropagation(); editOrder('${d.date}')">ดู/แก้ไขคำสั่งซื้อ</div>` : ''}
-                    </button>
-                `}).join('');
+            showNotification('ออกจากระบบสำเร็จ');
         }
 
-        function selectOrderDate(element, date) {
-            if (selectedOrderDate !== date) {
-                resetOrderState();
-                updateCartCount();
-            }
-            selectedOrderDate = date;
-            document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => card.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('categorySection').classList.remove('hidden');
-            if(document.getElementById('searchInput')) {
-                document.getElementById('searchInput').value = '';
-            }
-            renderProducts();
-        }
-
-        async function editOrder(date) {
-            showNotification('กำลังโหลดคำสั่งซื้อเดิม...', false);
-            const userOrders = await fetchData('Orders', { userId: currentUser.id, orderDate: date });
-            if (userOrders && userOrders.length > 0) {
-                cart = userOrders.map(order => ({
-                    ...products.find(p => p.id === order.productId),
-                    quantity: order.quantity,
-                    remark: order.remark,
-                    department: order.department
-                }));
-                existingOrderId = userOrders[0].orderId;
-                selectedOrderDate = date;
-                
-                document.querySelectorAll('#orderDateGrid .dept-card').forEach(card => {
-                    if (card.getAttribute('onclick').includes(`'${date}'`)) {
-                        card.classList.add('active');
-                    } else {
-                        card.classList.remove('active');
-                    }
-                });
-
-                document.getElementById('categorySection').classList.remove('hidden');
-                renderProducts();
-                updateCartCount();
-                openCart();
-            } else {
-                showNotification('ไม่พบคำสั่งซื้อเดิม หรือเกิดข้อผิดพลาด', true);
-            }
-        }
-
-        function renderCategories() {
-            const tabs = document.getElementById('categoryTabs');
-            tabs.innerHTML = `
-                <button class="category-tab active" onclick="filterCategory(this, 'all')">ทั้งหมด</button>
-                ${categories.map(cat => `
-                    <button class="category-tab" onclick="filterCategory(this, '${cat.id}')">${cat.name}</button>
-                `).join('')}
-            `;
-        }
-
-        function filterCategory(element, categoryId) {
-            selectedCategory = categoryId;
-            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
-            element.classList.add('active');
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-
-            let filteredProducts = selectedCategory === 'all'
-                ? products
-                : products.filter(p => p.category && p.category.trim().toLowerCase() === selectedCategory.toLowerCase());
-
-            if (searchTerm) {
-                filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-            }
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('currentUser').textContent = window.currentUser.name;
             
-            if (filteredProducts.length === 0) {
-                grid.innerHTML = `<p style="text-align: center; color: #666; grid-column: 1 / -1;">ไม่พบสินค้าที่ตรงกับการค้นหา</p>`;
-                return;
-            }
-
-            grid.innerHTML = filteredProducts.map(product => {
-                const itemInCart = cart.find(item => item.id === product.id);
-                const quantity = itemInCart ? itemInCart.quantity : 0;
-
-                return `
-                <div class="product-card">
-                    <div class="product-image">${product.icon || '📦'}</div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-description">${product.description}</div>
-                        <div class="product-footer">
-                            <div class="product-unit">${product.unit || 'N/A'}</div>
-                            <div class="product-quantity-controls">
-                                <button class="quantity-btn" onclick="updateProductQuantity(${product.id}, -1)">-</button>
-                                <input type="number" class="quantity-input" value="${quantity}" min="0" onchange="setProductQuantity(${product.id}, this.value)">
-                                <button class="quantity-btn" onclick="updateProductQuantity(${product.id}, 1)">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `}).join('');
-        }
-
-        // --- Cart and Checkout ---
-        function updateProductQuantity(productId, change) {
-            if (!selectedOrderDate) {
-                alert('กรุณาเลือกวันที่สั่งซื้อก่อน');
-                return;
-            }
-            let itemInCart = cart.find(item => item.id === productId);
-            let currentQuantity = itemInCart ? itemInCart.quantity : 0;
-            let newQuantity = Math.max(0, currentQuantity + change);
-            
-            setProductQuantity(productId, newQuantity);
-        }
-
-        function setProductQuantity(productId, newQuantity) {
-            if (!selectedOrderDate) {
-                alert('กรุณาเลือกวันที่สั่งซื้อก่อน');
-                return;
-            }
-            newQuantity = parseInt(newQuantity, 10);
-            if (isNaN(newQuantity) || newQuantity < 0) {
-                newQuantity = 0;
-            }
-
-            let itemInCart = cart.find(item => item.id === productId);
-
-            if (newQuantity > 0) {
-                if (itemInCart) {
-                    itemInCart.quantity = newQuantity;
-                } else {
-                    const product = products.find(p => p.id === productId);
-                    cart.push({ ...product, department: selectedDepartment, quantity: newQuantity, remark: '' });
-                }
-            } else {
-                // Remove from cart if quantity is 0
-                cart = cart.filter(item => item.id !== productId);
-            }
-            
-            updateCartCount();
-            renderProducts();
-        }
-
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cartCount').textContent = totalItems;
-        }
-
-        function openCart() {
-            document.getElementById('cartModal').style.display = 'block';
-            renderCart();
-        }
-
-        function closeCart() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-
-        function renderCart() {
-            const cartItemsDiv = document.getElementById('cartItems');
-            const deleteBtn = document.getElementById('deleteOrderBtn');
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            const cartTitle = document.getElementById('cartTitle');
-
-            if (existingOrderId) {
-                cartTitle.textContent = 'แก้ไขคำสั่งซื้อ';
-                deleteBtn.classList.remove('hidden');
-                checkoutBtn.textContent = 'บันทึกการเปลี่ยนแปลง';
-            } else {
-                cartTitle.textContent = 'ตะกร้าสินค้า';
-                deleteBtn.classList.add('hidden');
-                checkoutBtn.textContent = 'ยืนยันการสั่งซื้อ';
-            }
-
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p style="text-align: center; color: #666;">ตะกร้าว่างเปล่า</p>';
-                return;
-            }
-            
-            cartItemsDiv.innerHTML = cart.map((item, index) => `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-dept">แผนก: ${departments.find(d => d.id === item.department)?.name || ''}</div>
-                        <input type="text" class="form-input" style="margin-top: 0.5rem;" placeholder="เพิ่มหมายเหตุ..." value="${item.remark || ''}" onchange="updateRemark(${index}, this.value)">
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="product-quantity-controls">
-                            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, -1)">-</button>
-                            <input type="number" class="quantity-input" value="${item.quantity}" min="0" onchange="setCartItemQuantity(${index}, this.value)">
-                            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function updateRemark(index, value) {
-            cart[index].remark = value;
-        }
-
-        function updateCartItemQuantity(index, change) {
-            let newQuantity = Math.max(0, cart[index].quantity + change);
-            setCartItemQuantity(index, newQuantity);
-        }
-
-        function setCartItemQuantity(index, newQuantity) {
-            newQuantity = parseInt(newQuantity, 10);
-            if (isNaN(newQuantity) || newQuantity < 0) {
-                newQuantity = 0;
-            }
-
-            if (newQuantity > 0) {
-                cart[index].quantity = newQuantity;
-            } else {
-                cart.splice(index, 1);
-            }
-            
-            updateCartCount();
-            renderCart();
-            renderProducts();
-        }
-
-        async function checkout() {
-            const isEditing = !!existingOrderId;
-            if (cart.length === 0 && isEditing) {
-                deleteCurrentOrder();
-                return;
-            }
-            if (cart.length === 0) {
-                alert('กรุณาเลือกสินค้าก่อน');
-                return;
-            }
-            if (!confirm(isEditing ? 'ยืนยันการแก้ไขคำสั่งซื้อ?' : 'ยืนยันการสั่งซื้อ?')) return;
-
-            const payload = {
-                action: 'submitOrder',
-                data: {
-                    orderDate: selectedOrderDate,
-                    user: { id: currentUser.id, name: currentUser.name },
-                    cart: cart,
-                    existingOrderId: existingOrderId
-                }
-            };
-
-            const result = await postData(payload);
-            
-            if (result.status === 'success') {
-                alert(isEditing ? 'แก้ไขคำสั่งซื้อเรียบร้อยแล้ว' : 'ส่งคำสั่งซื้อเรียบร้อยแล้ว');
-                resetOrderState();
-                closeCart();
-                renderOrderDates();
-            } else {
-                alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง');
+            // Show admin button for admin users
+            if (window.currentUser.isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
             }
         }
 
-        async function deleteCurrentOrder() {
-            if (!existingOrderId) return;
-            if (!confirm('คุณต้องการยกเลิกคำสั่งซื้อนี้ทั้งหมดใช่หรือไม่?')) return;
-
-            const result = await postData({ action: 'deleteOrder', data: { orderId: existingOrderId } });
-            if (result.status === 'success') {
-                alert('ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว');
-                resetOrderState();
-                closeCart();
-                renderOrderDates();
-            } else {
-                alert('เกิดข้อผิดพลาดในการยกเลิกคำสั่งซื้อ');
-            }
-        }
-
-        // --- Admin Panel Functions ---
-        function toggleAdminPanel() {
-            const orderSection = document.getElementById('orderSection');
-            const adminPanel = document.getElementById('adminPanel');
-            
-            if (adminPanel.style.display === 'block') {
-                adminPanel.style.display = 'none';
-                orderSection.style.display = 'block';
-                renderOrderDates();
-            } else {
-                adminPanel.style.display = 'block';
-                orderSection.style.display = 'none';
-                showAdminTab('manageDates');
-            }
-        }
-
-        function showAdminTab(tab) {
-            activeAdminTab = tab;
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            const clickedButton = Array.from(document.querySelectorAll('.admin-tab')).find(button => button.getAttribute('onclick').includes(`'${tab}'`));
-            if (clickedButton) clickedButton.classList.add('active');
-            
-            switch(tab) {
-                case 'manageDates': renderManageDatesAdmin(); break;
-                case 'summary': renderOrderSummaryAdmin(); break;
-                case 'units': renderUnitsAdmin(); break;
-                case 'products': renderProductsAdmin(); break;
-                case 'departments': renderDepartmentsAdmin(); break;
-                case 'categories': renderCategoriesAdmin(); break;
-                case 'users': renderUsersAdmin(); break;
-            }
-        }
-
-        function renderManageDatesAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>จัดการวันสั่งซื้อ</h3>
-                    <p class="small-text">ฝ่ายจัดซื้อสามารถปิดรับออเดอร์ในแต่ละวันได้ที่นี่ ข้อมูลจะอัปเดตใน Google Sheet โดยตรง</p>
-                    <table class="admin-table">
-                        <thead><tr><th>วันที่</th><th>สถานะ</th><th>การจัดการ</th></tr></thead>
-                        <tbody>
-                            ${[...orderDates].sort((a, b) => new Date(b.date) - new Date(a.date)).map(d => `
-                                <tr>
-                                    <td>${new Date(d.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
-                                    <td><span style="color: ${d.status === 'open' ? 'green' : 'red'}; font-weight: bold;">${d.status === 'open' ? 'เปิดรับ' : 'ปิดแล้ว'}</span></td>
-                                    <td>
-                                        ${d.status === 'open' ? `<button class="action-btn delete-btn" onclick="closeOrderDate('${d.date}')">ปิดรับออเดอร์</button>` : 'ไม่มี'}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        async function closeOrderDate(dateToClose) {
-            if (!confirm(`คุณต้องการปิดรับออเดอร์ของวันที่ ${new Date(dateToClose).toLocaleDateString('th-TH')} ใช่หรือไม่?`)) return;
-            const result = await postData({ action: 'closeDate', data: { dateToClose } });
-            if (result.status === 'success') {
-                showNotification(`ส่งคำขอปิดรับออเดอร์แล้ว`, false);
-                const dateObj = orderDates.find(d => new Date(d.date).toISOString().split('T')[0] === new Date(dateToClose).toISOString().split('T')[0]);
-                if (dateObj) {
-                    dateObj.status = 'closed';
-                    renderManageDatesAdmin();
-                }
-            }
-        }
-
-        function renderOrderSummaryAdmin() {
-            const content = document.getElementById('adminContent');
-            const availableDates = [...new Set(orderDates.map(d => d.date))].sort((a, b) => new Date(b) - new Date(a));
-
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>สรุปยอดสั่งซื้อประจำวัน</h3>
-                    <p class="small-text">เลือกวันที่ต้องการดูยอดสรุป ระบบจะรวบรวมสินค้าชนิดเดียวกันจากทุกแผนก</p>
-                    <div class="form-group" style="display: flex; gap: 1rem; align-items: center;">
-                        <select class="form-input" id="summaryDateSelect">
-                            <option value="">-- เลือกวันที่ --</option>
-                            ${availableDates.map(date => `<option value="${date}">${new Date(date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</option>`).join('')}
-                        </select>
-                        <button class="login-btn" style="width: auto; padding: 0.75rem 1.5rem;" onclick="getAndRenderSummary()">ดูสรุป</button>
-                    </div>
-                    <div id="summaryResult"></div>
-                    <div id="printButtonsContainer" class="hidden" style="margin-top: 2rem; display: flex; gap: 1rem;">
-                        <button class="login-btn" onclick="printSummary('consolidated')">🖨️ พิมพ์แบบรวมสินค้า</button>
-                        <button class="login-btn" style="background: #667eea;" onclick="printSummary('department')">🖨️ พิมพ์แบบแยกแผนก</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function getAndRenderSummary() {
-            const selectedDate = document.getElementById('summaryDateSelect').value;
-            const resultDiv = document.getElementById('summaryResult');
-            const printContainer = document.getElementById('printButtonsContainer');
-            
-            if (!selectedDate) {
-                resultDiv.innerHTML = '<p style="color: red;">กรุณาเลือกวันที่</p>';
-                printContainer.classList.add('hidden');
-                return;
-            }
-            resultDiv.innerHTML = '<p>กำลังโหลดข้อมูลสรุป...</p>';
-            printContainer.classList.add('hidden');
-            
-            try {
-                const ordersForDay = await fetchData('Orders', { orderDate: selectedDate });
-                currentSummaryData = ordersForDay;
-
-                if (ordersForDay.length === 0) {
-                    resultDiv.innerHTML = '<p>ไม่พบข้อมูลการสั่งซื้อสำหรับวันที่เลือก</p>';
-                    return;
-                }
-
-                const summary = {};
-                ordersForDay.forEach(order => {
-                    const productId = order.productId;
-                    if (!summary[productId]) {
-                        summary[productId] = { name: order.productName, icon: products.find(p => p.id === productId)?.icon || '📦', totalQuantity: 0, departments: {} };
-                    }
-                    summary[productId].totalQuantity += Number(order.quantity);
-                    const deptName = departments.find(d => d.id === order.department)?.name || order.department;
-                    if (!summary[productId].departments[deptName]) {
-                        summary[productId].departments[deptName] = { qty: 0, remarks: [] };
-                    }
-                    summary[productId].departments[deptName].qty += Number(order.quantity);
-                    if (order.remark) {
-                        summary[productId].departments[deptName].remarks.push(order.remark);
-                    }
-                });
-
-                resultDiv.innerHTML = `
-                    <h4>ยอดสรุปรวมสำหรับวันที่ ${new Date(selectedDate).toLocaleDateString('th-TH')}</h4>
-                    <table class="admin-table" style="margin-top: 1rem;">
-                        <thead><tr><th>สินค้า</th><th style="text-align: right;">จำนวนรวม</th><th>สั่งจากแผนก (จำนวน/หมายเหตุ)</th></tr></thead>
-                        <tbody>
-                            ${Object.values(summary).sort((a,b) => a.name.localeCompare(b.name)).map(item => `
-                                <tr>
-                                    <td>${item.icon} ${item.name}</td>
-                                    <td style="text-align: right; font-weight: bold;">${item.totalQuantity} ${products.find(p=>p.name === item.name)?.unit || ''}</td>
-                                    <td>
-                                        ${Object.entries(item.departments).map(([dept, data]) => `
-                                            <div><b>${dept}:</b> ${data.qty}</div>
-                                            ${data.remarks.length > 0 ? `
-                                                <div style="font-size: 0.8em; color: #666; padding-left: 1rem;">
-                                                    ${data.remarks.map(r => `&bull; ${r}`).join('<br>')}
-                                                </div>
-                                            ` : ''}
-                                        `).join('')}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>`;
-                printContainer.classList.remove('hidden');
-            } catch (error) {
-                resultDiv.innerHTML = `<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูลสรุป: ${error.message}</p>`;
-            }
-        }
-
-        function printSummary(mode) {
-            if (currentSummaryData.length === 0) {
-                alert('ไม่มีข้อมูลสรุปให้พิมพ์');
-                return;
-            }
-
-            const printArea = document.getElementById('print-area');
-            const selectedDate = document.getElementById('summaryDateSelect').value;
-            let printContent = `<h2>สรุปรายการสั่งซื้อประจำวันที่ ${new Date(selectedDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</h2>`;
-
-            if (mode === 'consolidated') {
-                const summaryTable = document.querySelector('#summaryResult table');
-                if (summaryTable) {
-                    printContent += '<h3>แบบรวมสินค้า</h3>';
-                    printContent += summaryTable.outerHTML;
-                } else {
-                    alert('ไม่พบตารางสรุป');
-                    return;
-                }
-            } else if (mode === 'department') {
-                printContent += '<h3>แบบแยกตามแผนก</h3>';
-                const ordersByDept = {};
-
-                currentSummaryData.forEach(order => {
-                    const deptName = departments.find(d => d.id === order.department)?.name || order.department;
-                    if (!ordersByDept[deptName]) {
-                        ordersByDept[deptName] = [];
-                    }
-                    ordersByDept[deptName].push(order);
-                });
-
-                for (const dept in ordersByDept) {
-                    printContent += `<h4>แผนก: ${dept}</h4>`;
-                    printContent += `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>สินค้า</th>
-                                    <th style="text-align: right;">จำนวน</th>
-                                    <th>หน่วย</th>
-                                    <th>หมายเหตุ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${ordersByDept[dept].sort((a,b) => a.productName.localeCompare(b.productName)).map(item => `
-                                    <tr>
-                                        <td>${products.find(p => p.id === item.productId)?.icon || '📦'} ${item.productName}</td>
-                                        <td style="text-align: right;">${item.quantity}</td>
-                                        <td>${item.unit}</td>
-                                        <td>${item.remark || ''}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                }
-            }
-
-            printArea.innerHTML = printContent;
-            window.print();
-        }
-
-        function renderUnitsAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>จัดการหน่วยนับ</h3>
-                    <p class="small-text">เพิ่มหรือลบหน่วยนับที่ใช้ในระบบ การเปลี่ยนแปลงจะมีผลกับ Google Sheet โดยตรง</p>
-                    <div id="unitList">
-                        ${units.map((unit, index) => `
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                                <input type="text" class="form-input" value="${unit.name}" onchange="updateLocalUnit(${index}, this.value)">
-                                <button class="action-btn delete-btn" onclick="deleteLocalUnit(${index})">ลบ</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <input type="text" class="form-input" id="newUnitInput" placeholder="เพิ่มหน่วยนับใหม่...">
-                        <button class="add-btn" style="margin-bottom: 0;" onclick="addLocalUnit()">+ เพิ่ม</button>
-                    </div>
-                    <hr style="margin: 2rem 0;">
-                    <button class="login-btn" onclick="saveUnits()">บันทึกการเปลี่ยนแปลงทั้งหมด</button>
-                </div>
-            `;
-        }
-
-        function updateLocalUnit(index, value) {
-            units[index].name = value;
-        }
-
-        function deleteLocalUnit(index) {
-            units.splice(index, 1);
-            renderUnitsAdmin();
-        }
-
-        function addLocalUnit() {
-            const input = document.getElementById('newUnitInput');
-            const newUnitName = input.value.trim();
-            if (newUnitName && !units.some(u => u.name === newUnitName)) {
-                units.push({ name: newUnitName });
-                renderUnitsAdmin();
-            } else {
-                alert('หน่วยนับนี้มีอยู่แล้ว หรือชื่อไม่ถูกต้อง');
-            }
-        }
-
-        async function saveUnits() {
-            if (!confirm('ยืนยันการบันทึกหน่วยนับทั้งหมด? การกระทำนี้จะเขียนทับข้อมูลใน Google Sheet')) return;
-            const result = await postData({ action: 'updateUnits', data: { units } });
-            if (result.status === 'success') {
-                showNotification('บันทึกหน่วยนับเรียบร้อยแล้ว', false);
-            }
-        }
-
-        function renderProductsAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>ข้อมูลสินค้า</h3>
-                    <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
-                    <table class="admin-table">
-                        <thead><tr><th>รหัส</th><th>ชื่อสินค้า</th><th>รายละเอียด</th><th>หน่วยนับ</th><th>หมวดหมู่</th></tr></thead>
-                        <tbody>
-                            ${products.map(product => `
-                                <tr>
-                                    <td>${product.id}</td>
-                                    <td>${product.icon || ''} ${product.name}</td>
-                                    <td>${product.description}</td>
-                                    <td>${product.unit}</td>
-                                    <td>${categories.find(c => c.id === product.category)?.name || product.category}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderDepartmentsAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>ข้อมูลแผนก</h3>
-                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
-                    <table class="admin-table">
-                        <thead><tr><th>รหัส</th><th>ไอคอน</th><th>ชื่อแผนก</th></tr></thead>
-                        <tbody>
-                            ${departments.map(dept => `
-                                <tr>
-                                    <td>${dept.id}</td>
-                                    <td>${dept.icon}</td>
-                                    <td>${dept.name}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderCategoriesAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>ข้อมูลหมวดหมู่</h3>
-                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
-                    <table class="admin-table">
-                        <thead><tr><th>รหัส</th><th>ชื่อหมวดหมู่</th></tr></thead>
-                        <tbody>
-                            ${categories.map(cat => `
-                                <tr>
-                                    <td>${cat.id}</td>
-                                    <td>${cat.name}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function renderUsersAdmin() {
-            const content = document.getElementById('adminContent');
-            content.innerHTML = `
-                <div class="admin-section">
-                    <h3>ข้อมูลผู้ใช้</h3>
-                     <p class="small-text">ข้อมูลนี้ถูกดึงมาจาก Google Sheet โดยตรง หากต้องการแก้ไข กรุณาไปที่ไฟล์ Sheet</p>
-                    <table class="admin-table">
-                        <thead><tr><th>รหัส</th><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>สิทธิ์</th><th>แผนก</th></tr></thead>
-                        <tbody>
-                            ${users.map(user => `
-                                <tr>
-                                    <td>${user.id}</td>
-                                    <td>${user.username}</td>
-                                    <td>${user.name}</td>
-                                    <td>${user.role === 'admin' ? 'ผู้ดูแล' : 'ผู้ใช้งาน'}</td>
-                                    <td>${departments.find(d => d.id === user.department)?.name || user.department}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            document.getElementById('searchInput').addEventListener('input', renderProducts);
-            initializeApp();
-        });
-
-        // --- Utility ---
+        // --- Utility Functions ---
         function showNotification(message, isError = false) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: ${isError ? '#ff5252' : '#00d09c'};
-                color: white;
-                padding: 1rem 2rem;
-                border-radius: 25px;
-                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-                animation: slideUp 0.3s;
-                z-index: 1001;
-                text-align: center;
-            `;
+            const notification = document.getElementById('notification');
             notification.textContent = message;
-            document.body.appendChild(notification);
+            notification.style.display = 'block';
+            notification.style.backgroundColor = isError ? '#ff5252' : '#4caf50';
             
+            // Auto-hide after 3 seconds
             setTimeout(() => {
-                notification.remove();
+                notification.style.display = 'none';
             }, 3000);
         }
 
-        window.onclick = function(event) {
-            const cartModal = document.getElementById('cartModal');
-            if (event.target === cartModal) closeCart();
+        // --- UI Rendering Functions ---
+        function renderUI() {
+            // แสดงหน้าหลักหลังจาก login
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // เรียกใช้ฟังก์ชันแสดงผลต่างๆ
+            renderOrderDates();
+            renderCategories();
+            updateCartCount();
+        }
+
+        function renderOrderDates() {
+            const orderDateGrid = document.getElementById('orderDateGrid');
+            orderDateGrid.innerHTML = '';
+            
+            if (!window.orderDates || window.orderDates.length === 0) {
+                orderDateGrid.innerHTML = '<p class="empty-message">ไม่มีวันที่สั่งซื้อที่เปิดรับ</p>';
+                return;
+            }
+            
+            window.orderDates.forEach(date => {
+                const card = document.createElement('div');
+                card.className = 'order-date-card';
+                if (date.date === window.selectedOrderDate) {
+                    card.classList.add('selected');
+                }
+                if (date.closed) {
+                    card.classList.add('closed');
+                }
+                
+                card.dataset.date = date.date;
+                card.innerHTML = `
+                    <div class="date-info">
+                        <div class="date">${formatDate(date.date)}</div>
+                        <div class="status">${date.closed ? '🔒 ปิดรับออเดอร์' : '🔓 เปิดรับออเดอร์'}</div>
+                    </div>
+                    ${date.hasOwnProperty('orderCount') ? `
+                        <div class="order-count">
+                            จำนวนออเดอร์: ${date.orderCount}
+                        </div>
+                    ` : ''}
+                    ${window.currentUser?.isAdmin ? `
+                        <div class="admin-controls">
+                            <button onclick="closeOrderDate('${date.date}')" class="action-btn" ${date.closed ? 'disabled' : ''}>
+                                ${date.closed ? 'ปิดแล้ว' : 'ปิดรับออเดอร์'}
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // เพิ่ม event listener สำหรับการคลิกเลือกวันที่
+                if (!date.closed) {
+                    card.addEventListener('click', () => selectOrderDate(date.date));
+                }
+                
+                orderDateGrid.appendChild(card);
+            });
+        }
+
+        function renderCategories() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            categoryTabs.innerHTML = `
+                <button class="category-tab ${window.selectedCategory === 'all' ? 'active' : ''}" 
+                        onclick="selectCategory('all')">
+                    ทั้งหมด
+                </button>
+            `;
+            
+            window.categories.forEach(category => {
+                categoryTabs.innerHTML += `
+                    <button class="category-tab ${window.selectedCategory === category.id ? 'active' : ''}"
+                            onclick="selectCategory('${category.id}')">
+                        ${category.name}
+                    </button>
+                `;
+            });
+        }
+
+        function renderUnits() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการหน่วยนับ</h2>
+                    <div class="form-group">
+                        <label>เพิ่มหน่วยนับใหม่</label>
+                        <input type="text" id="newUnitInput" class="form-input" placeholder="ระบุชื่อหน่วยนับ">
+                        <button onclick="addUnit()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="units-list">
+                        ${window.units.map(unit => `
+                            <div class="unit-item">
+                                <span>${unit.name}</span>
+                                <button onclick="deleteUnit('${unit.id}')" class="delete-btn">ลบ</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductManagement() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการสินค้า</h2>
+                    <div class="form-group">
+                        <label>เพิ่มสินค้าใหม่</label>
+                        <input type="text" id="newProductName" class="form-input" placeholder="ชื่อสินค้า">
+                        <select id="productCategory" class="form-input">
+                            ${window.categories.map(cat => 
+                                `<option value="${cat.id}">${cat.name}</option>`
+                            ).join('')}
+                        </select>
+                        <select id="productUnit" class="form-input">
+                            ${window.units.map(unit => 
+                                `<option value="${unit.id}">${unit.name}</option>`
+                            ).join('')}
+                        </select>
+                        <button onclick="addProduct()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="products-list">
+                        ${window.products.map(product => `
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <span class="product-name">${product.name}</span>
+                                    <span class="product-category">${getCategoryName(product.category)}</span>
+                                    <span class="product-unit">${getUnitName(product.unit)}</span>
+                                </div>
+                                <div class="product-controls">
+                                    <button onclick="editProduct('${product.id}')" class="edit-btn">แก้ไข</button>
+                                    <button onclick="deleteProduct('${product.id}')" class="delete-btn">ลบ</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Helper Functions ---
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('th-TH', options);
+        }
+
+        function getCategoryName(categoryId) {
+            const category = window.categories.find(c => c.id === categoryId);
+            return category ? category.name : 'ไม่ระบุหมวดหมู่';
+        }
+
+        function getUnitName(unitId) {
+            const unit = window.units.find(u => u.id === unitId);
+            return unit ? unit.name : 'ไม่ระบุหน่วย';
+        }
+
+        function selectCategory(categoryId) {
+            window.selectedCategory = categoryId;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('onclick').includes(categoryId));
+            });
+            renderProducts();
+        }
+
+        // เพิ่มฟังก์ชัน goHome
+        function goHome() {
+            // ซ่อน admin panel ถ้ากำลังแสดงอยู่
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('orderSection').style.display = 'block';
+            
+            // รีเซ็ตการเลือกวันที่และหมวดหมู่
+            window.selectedOrderDate = null;
+            window.selectedCategory = 'all';
+            
+            // อัพเดท UI
+            renderUI();
         }
     </script>
-</body>
 </body>
 </html>
