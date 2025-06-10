@@ -564,6 +564,33 @@
             }, 3000);
         }
 
+        function showError(message) {
+          const errorDiv = document.getElementById('error-message');
+          if (!errorDiv) {
+            const div = document.createElement('div');
+            div.id = 'error-message';
+            div.style.color = 'red';
+            div.style.padding = '10px';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          errorDiv.textContent = message;
+          setTimeout(() => {
+            errorDiv.textContent = '';
+          }, 3000);
+        }
+
+        function showLoading(show = true) {
+          const loadingDiv = document.getElementById('loading');
+          if (!loadingDiv) {
+            const div = document.createElement('div');
+            div.id = 'loading';
+            div.style.display = 'none';
+            div.textContent = 'กำลังดำเนินการ...';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
         // --- UI Rendering Functions ---
         function renderUI() {
             // แสดงหน้าหลักหลังจาก login
@@ -702,6 +729,67 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Add reset password function
+        async function resetPassword(userId) {
+          if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรหัสผ่านของผู้ใช้นี้?')) {
+            return;
+          }
+          
+          showLoading(true);
+          try {
+            const response = await fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({
+                action: 'resetPassword',
+                userId: userId
+              })
+            });
+            
+            const result = await response.json();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            
+            alert('ลบรหัสผ่านเรียบร้อยแล้ว');
+            loadUsers(); // Refresh user list
+          } catch (error) {
+            showError(error.message);
+          } finally {
+            showLoading(false);
+          }
+        }
+
+        // Update user list display to include reset password button
+        function displayUsers(users) {
+          const container = document.getElementById('userList');
+          container.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>รหัสผู้ใช้</th>
+                  <th>ชื่อ</th>
+                  <th>ตำแหน่ง</th>
+                  <th>การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users.map(user => `
+                  <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>
+                      <button onclick="resetPassword('${user.id}')" class="btn btn-warning btn-sm">
+                        ลบรหัสผ่าน
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
         }
 
         // --- Helper Functions ---
@@ -857,7 +945,7 @@
 
     <script>
         // --- Google Sheet Integration ---
-        window.SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdE0SwXv0Jb7d1IDD4XPRghdPhsrkqK1MQ_oueyqP4wdEakTJr3c3BoCVJaWihPwG-/exec';
+        window.SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5k7Glcq1g1UIgtfOrQoXQSufBBwNiuFo1whAds3Onzr8v4PWRRmy3sA2DW6_og1NgVA/exec';
         window.SPREADSHEET_ID = '1k3g208t8UhaRC5Gig5oht7KpUVWTbtWPJmzAVEgYFWU';
 
         // State management
@@ -1071,6 +1159,33 @@
             }, 3000);
         }
 
+        function showError(message) {
+          const errorDiv = document.getElementById('error-message');
+          if (!errorDiv) {
+            const div = document.createElement('div');
+            div.id = 'error-message';
+            div.style.color = 'red';
+            div.style.padding = '10px';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          errorDiv.textContent = message;
+          setTimeout(() => {
+            errorDiv.textContent = '';
+          }, 3000);
+        }
+
+        function showLoading(show = true) {
+          const loadingDiv = document.getElementById('loading');
+          if (!loadingDiv) {
+            const div = document.createElement('div');
+            div.id = 'loading';
+            div.style.display = 'none';
+            div.textContent = 'กำลังดำเนินการ...';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
         // --- UI Rendering Functions ---
         function renderUI() {
             // แสดงหน้าหลักหลังจาก login
@@ -1209,6 +1324,67 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Add reset password function
+        async function resetPassword(userId) {
+          if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรหัสผ่านของผู้ใช้นี้?')) {
+            return;
+          }
+          
+          showLoading(true);
+          try {
+            const response = await fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({
+                action: 'resetPassword',
+                userId: userId
+              })
+            });
+            
+            const result = await response.json();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            
+            alert('ลบรหัสผ่านเรียบร้อยแล้ว');
+            loadUsers(); // Refresh user list
+          } catch (error) {
+            showError(error.message);
+          } finally {
+            showLoading(false);
+          }
+        }
+
+        // Update user list display to include reset password button
+        function displayUsers(users) {
+          const container = document.getElementById('userList');
+          container.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>รหัสผู้ใช้</th>
+                  <th>ชื่อ</th>
+                  <th>ตำแหน่ง</th>
+                  <th>การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users.map(user => `
+                  <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>
+                      <button onclick="resetPassword('${user.id}')" class="btn btn-warning btn-sm">
+                        ลบรหัสผ่าน
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
         }
 
         // --- Helper Functions ---

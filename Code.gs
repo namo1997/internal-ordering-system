@@ -235,46 +235,45 @@ function doGet(e) {
 }
 
 function doPost(e) {
-  return handleRequest(e);
-}
-
-function handleRequest(e) {
-  const params = e.parameter;
-  const action = params.action;
+  const data = JSON.parse(e.postData.contents);
   
-  try {
-    let result;
-    switch(action) {
-      case 'login':
-        result = handleLogin(params.username, params.password);
-        break;
-      case 'getProducts':
-        result = getProducts();
-        break;
-      case 'getCategories':
-        result = getCategories();
-        break;
-      case 'getDepartments':
-        result = getDepartments();
-        break;
-      case 'createOrder':
-        result = createOrder(params.orderData);
-        break;
-      case 'getOrders':
-        result = getOrders(params.userId);
-        break;
-      case 'getAdminData':
-        result = getAdminData();
-        break;
-      default:
-        result = { error: 'Invalid action' };
-    }
-    
-    return ContentService.createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({ error: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+  switch (data.action) {
+    case 'login':
+      return ContentService.createTextOutput(JSON.stringify(handleLogin(data.username, data.password)))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getProducts':
+      return ContentService.createTextOutput(JSON.stringify(getProducts()))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getCategories':
+      return ContentService.createTextOutput(JSON.stringify(getCategories()))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getDepartments':
+      return ContentService.createTextOutput(JSON.stringify(getDepartments()))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'createOrder':
+      return ContentService.createTextOutput(JSON.stringify(createOrder(data.orderData)))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getOrders':
+      return ContentService.createTextOutput(JSON.stringify(getOrders(data.userId)))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getAdminData':
+      return ContentService.createTextOutput(JSON.stringify(getAdminData()))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'resetPassword':
+      return ContentService.createTextOutput(JSON.stringify(resetPassword(data)))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'getUsers':
+      return ContentService.createTextOutput(JSON.stringify(getUsers()))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'addUser':
+      return ContentService.createTextOutput(JSON.stringify(addUser(data.userData)))
+        .setMimeType(ContentService.MimeType.JSON);
+    case 'updateUser':
+      return ContentService.createTextOutput(JSON.stringify(updateUser(data.userId, data.userData)))
+        .setMimeType(ContentService.MimeType.JSON);
+    default:
+      return ContentService.createTextOutput(JSON.stringify({ error: 'Invalid action' }))
+        .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -419,15 +418,199 @@ function getAllOrders() {
   });
 }
 
-// Utility Functions
-function getSheetData(sheet) {
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  return data.slice(1).map(row => {
-    const obj = {};
-    headers.forEach((header, index) => {
-      obj[header] = row[index];
-    });
-    return obj;
+// ฟังก์ชันสำหรับตรวจสอบความถูกต้องของข้อมูล
+function validateProduct(product) {
+  if (!product.name || product.name.trim() === '') {
+    throw new Error('Product name is required');
+  }
+  if (!product.price || isNaN(product.price) || product.price < 0) {
+    throw new Error('Invalid product price');
+  }
+  if (!product.unit || product.unit.trim() === '') {
+    throw new Error('Product unit is required');
+  }
+  return true;
+}
+
+function validateOrder(order) {
+  if (!order.userId || order.userId.trim() === '') {
+    throw new Error('User ID is required');
+  }
+  if (!Array.isArray(order.items) || order.items.length === 0) {
+    throw new Error('Order must contain at least one item');
+  }
+  order.items.forEach((item, index) => {
+    if (!item.productId || !item.quantity || item.quantity < 1) {
+      throw new Error(`Invalid item at position ${index + 1}`);
+    }
   });
+  return true;
+}
+
+function validateUser(user) {
+  if (!user.username || user.username.trim() === '') {
+    throw new Error('กรุณาระบุชื่อผู้ใช้');
+  }
+  if (!user.name || user.name.trim() === '') {
+    throw new Error('กรุณาระบุชื่อ-นามสกุล');
+  }
+  if (!user.department || user.department.trim() === '') {
+    throw new Error('กรุณาระบุแผนก');
+  }
+  if (!user.role || user.role.trim() === '') {
+    throw new Error('กรุณาระบุตำแหน่ง');
+  }
+  return true;
+}
+
+// เพิ่มการตรวจสอบความถูกต้องในฟังก์ชัน addProduct
+function addProduct(data) {
+  try {
+    validateProduct(data);
+    const productsSheet = ss.getSheetByName('Products');
+    const productId = Utilities.getUuid();
+    
+    // เพิ่มแถวใหม่ใน Google Sheets
+    productsSheet.appendRow([
+      productId,
+      data.name,
+      data.price,
+      data.category,
+      data.department,
+      data.unit
+    ]);
+    
+    return { 
+      success: true, 
+      message: 'เพิ่มสินค้าสำเร็จ', 
+      productId: productId 
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+// เพิ่มการตรวจสอบความถูกต้องในฟังก์ชัน createOrder
+function createOrder(data) {
+  try {
+    validateOrder(data);
+    const orderData = JSON.parse(data);
+    const ordersSheet = ss.getSheetByName('Orders');
+    const orderDatesSheet = ss.getSheetByName('OrderDates');
+    
+    // Generate order ID
+    const orderId = Utilities.getUuid();
+    
+    // Add order date
+    orderDatesSheet.appendRow([
+      orderId,
+      orderData.userId,
+      orderData.department,
+      orderData.totalAmount,
+      new Date(),
+      'Pending'
+    ]);
+    
+    // Add order items
+    orderData.items.forEach(item => {
+      ordersSheet.appendRow([
+        orderId,
+        item.productId,
+        item.quantity,
+        item.price
+      ]);
+    });
+    
+    return { success: true, orderId: orderId };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+function resetPassword(data) {
+  try {
+    const { userId } = data;
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+    
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Users');
+    const users = sheet.getDataRange().getValues();
+    const headers = users[0];
+    const userIdIndex = headers.indexOf('id');
+    const passwordIndex = headers.indexOf('password');
+    
+    for (let i = 1; i < users.length; i++) {
+      if (users[i][userIdIndex] === userId) {
+        // Reset password to empty string
+        sheet.getRange(i + 1, passwordIndex + 1).setValue('');
+        return { success: true, message: 'Password has been reset successfully' };
+      }
+    }
+    
+    throw new Error('User not found');
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+// ฟังก์ชันสำหรับจัดการผู้ใช้
+function getUsers() {
+  const usersSheet = ss.getSheetByName('Users');
+  return getSheetData(usersSheet);
+}
+
+function addUser(userData) {
+  try {
+    validateUser(userData);
+    const usersSheet = ss.getSheetByName('Users');
+    const userId = Utilities.getUuid();
+    
+    // เพิ่มผู้ใช้ใหม่
+    usersSheet.appendRow([
+      userId,
+      userData.username,
+      userData.password,  // เก็บรหัสผ่านใน sheet
+      userData.name,
+      userData.department,
+      userData.role
+    ]);
+    
+    return { 
+      success: true, 
+      message: 'เพิ่มผู้ใช้สำเร็จ',
+      userId: userId 
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+function updateUser(userId, userData) {
+  try {
+    validateUser(userData);
+    const usersSheet = ss.getSheetByName('Users');
+    const users = usersSheet.getDataRange().getValues();
+    const headers = users[0];
+    const userIdIndex = headers.indexOf('id');
+    
+    for (let i = 1; i < users.length; i++) {
+      if (users[i][userIdIndex] === userId) {
+        // อัพเดทข้อมูลผู้ใช้
+        usersSheet.getRange(i + 1, 2).setValue(userData.username);
+        if (userData.password) { // อัพเดทรหัสผ่านถ้ามีการเปลี่ยน
+          usersSheet.getRange(i + 1, 3).setValue(userData.password);
+        }
+        usersSheet.getRange(i + 1, 4).setValue(userData.name);
+        usersSheet.getRange(i + 1, 5).setValue(userData.department);
+        usersSheet.getRange(i + 1, 6).setValue(userData.role);
+        
+        return { success: true, message: 'อัพเดทผู้ใช้สำเร็จ' };
+      }
+    }
+    
+    throw new Error('ไม่พบผู้ใช้');
+  } catch (e) {
+    return { error: e.message };
+  }
 }
