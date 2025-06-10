@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="th">
+    <title>ระบบสั่งของภายในองค์กร</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f6fa;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00d09c 0%, #00b386 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+
+        .login-btn {
+            background: #00d09c;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #00b386;
+            transform: translateY(-2px);
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            color: #ff5252;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* Notification */
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00d09c;
+            box-shadow: 0 0 0 3px rgba(0,208,156,0.2);
+        }
+
+        /* Buttons */
+        .action-btn {
+            background: #00d09c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #00b386;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #ff1a1a;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .product-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .product-unit {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        /* Order Dates Grid */
+        .order-dates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .order-date-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .order-date-card:hover:not(.closed) {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .order-date-card.selected {
+            border: 2px solid #00d09c;
+        }
+
+        .order-date-card.closed {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            background: none;
+            border: 2px solid #00d09c;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #00d09c;
+            transition: all 0.3s;
+        }
+
+        .category-tab:hover {
+            background: rgba(0,208,156,0.1);
+        }
+
+        .category-tab.active {
+            background: #00d09c;
+            color: white;
+        }
+
+        /* Admin Section */
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .admin-section h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .summary-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+    
+    <!-- เพิ่ม Google Sheets API -->
+    <script>
+        // ฟังก์ชันสำหรับเชื่อมต่อกับ Google Sheets
+        async function fetchDataFromSheet() {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    mode: 'cors',
+                });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+        }
+
+        // ฟังก์ชันสำหรับบันทึกข้อมูลลง Google Sheets
+        async function saveDataToSheet(data) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                throw error;
+            }
+        }
+
+        // --- Google Sheet Integration ---
+        const SCRIPT_URL = 'YOUR_DEPLOYED_SCRIPT_URL_HERE';
+
+        // State management
+        let currentUser = null;
+        let selectedOrderDate = null;
+        let selectedDepartment = '';
+        let selectedCategory = 'all';
+        let cart = [];
+        let activeAdminTab = 'manageDates';
+        let currentSummaryData = [];
+        let existingOrderId = null;
+
+        // Data stores
+        window.users = [];
+        window.departments = [];
+        window.categories = [];
+        window.products = [];
+        window.orderDates = [];
+        window.units = [];
+
+        // --- API Functions ---
+        async function fetchData(action, params = {}) {
+            const queryParams = new URLSearchParams({
+                action,
+                ...params
+            }).toString();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${queryParams}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update local data stores if appropriate
+                if (action === 'getData') {
+                    if (data.users) users = data.users;
+                    if (data.departments) departments = data.departments;
+                    if (data.categories) categories = data.categories;
+                    if (data.products) products = data.products;
+                    if (data.orderDates) orderDates = data.orderDates;
+                    if (data.units) units = data.units;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showNotification(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        async function postData(action, payload) {
+            showNotification('กำลังดำเนินการ...', false);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...payload
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // On success, refresh the relevant data
+                if (['addOrder', 'updateOrder', 'deleteOrder'].includes(action)) {
+                    await loadOrderDates();
+                } else if (['addProduct', 'updateProduct', 'deleteProduct'].includes(action)) {
+                    await loadProducts();
+                }
+                
+                // Show success message
+                showNotification(data.message || 'ดำเนินการเรียบร้อย');
+                return data;
+            } catch (error) {
+                console.error('Error posting data:', error);
+                showNotification(`เกิดข้อผิดพลาด: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        // --- Data Loading Functions ---
+        async function loadInitialData() {
+            try {
+                const data = await fetchData('getData');
+                renderUI();
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        async function loadOrderDates() {
+            try {
+                const data = await fetchData('getOrderDates');
+                if (data.orderDates) {
+                    orderDates = data.orderDates;
+                    renderOrderDates();
+                }
+            } catch (error) {
+                console.error('Error loading order dates:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const data = await fetchData('getProducts');
+                if (data.products) {
+                    products = data.products;
+                    renderProducts();
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // --- Authentication Functions ---
+        async function login(username) {
+            try {
+                const response = await fetchData('login', { username });
+                const user = response.user;
+                
+                if (!user) {
+                    throw new Error('ไม่พบข้อมูลผู้ใช้');
+                }
+                
+                // Store user info
+                window.currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                updateUIForLoggedInUser();
+                showNotification('เข้าสู่ระบบสำเร็จ');
+                
+                // Load initial data
+                await loadInitialData();
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, true);
+            }
+        }
+
+        function logout() {
+            // Clear user data
+            window.currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            
+            // Clear all data stores
+            window.users = [];
+            window.departments = [];
+            window.categories = [];
+            window.products = [];
+            window.orderDates = [];
+            window.units = [];
+            window.cart = [];
+            
+            // Reset UI state
+            window.selectedOrderDate = null;
+            window.selectedDepartment = '';
+            window.selectedCategory = 'all';
+            window.activeAdminTab = 'manageDates';
+            
+            // Update UI
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminBtn').classList.add('hidden');
+            
+            showNotification('ออกจากระบบสำเร็จ');
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('currentUser').textContent = window.currentUser.name;
+            
+            // Show admin button for admin users
+            if (window.currentUser.isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+            }
+        }
+
+        // --- Utility Functions ---
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.backgroundColor = isError ? '#ff5252' : '#4caf50';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+          const errorDiv = document.getElementById('error-message');
+          if (!errorDiv) {
+            const div = document.createElement('div');
+            div.id = 'error-message';
+            div.style.color = 'red';
+            div.style.padding = '10px';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          errorDiv.textContent = message;
+          setTimeout(() => {
+            errorDiv.textContent = '';
+          }, 3000);
+        }
+
+        function showLoading(show = true) {
+          const loadingDiv = document.getElementById('loading');
+          if (!loadingDiv) {
+            const div = document.createElement('div');
+            div.id = 'loading';
+            div.style.display = 'none';
+            div.textContent = 'กำลังดำเนินการ...';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        // --- UI Rendering Functions ---
+        function renderUI() {
+            // แสดงหน้าหลักหลังจาก login
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // เรียกใช้ฟังก์ชันแสดงผลต่างๆ
+            renderOrderDates();
+            renderCategories();
+            updateCartCount();
+        }
+
+        function renderOrderDates() {
+            const orderDateGrid = document.getElementById('orderDateGrid');
+            orderDateGrid.innerHTML = '';
+            
+            if (!window.orderDates || window.orderDates.length === 0) {
+                orderDateGrid.innerHTML = '<p class="empty-message">ไม่มีวันที่สั่งซื้อที่เปิดรับ</p>';
+                return;
+            }
+            
+            window.orderDates.forEach(date => {
+                const card = document.createElement('div');
+                card.className = 'order-date-card';
+                if (date.date === window.selectedOrderDate) {
+                    card.classList.add('selected');
+                }
+                if (date.closed) {
+                    card.classList.add('closed');
+                }
+                
+                card.dataset.date = date.date;
+                card.innerHTML = `
+                    <div class="date-info">
+                        <div class="date">${formatDate(date.date)}</div>
+                        <div class="status">${date.closed ? '🔒 ปิดรับออเดอร์' : '🔓 เปิดรับออเดอร์'}</div>
+                    </div>
+                    ${date.hasOwnProperty('orderCount') ? `
+                        <div class="order-count">
+                            จำนวนออเดอร์: ${date.orderCount}
+                        </div>
+                    ` : ''}
+                    ${window.currentUser?.isAdmin ? `
+                        <div class="admin-controls">
+                            <button onclick="closeOrderDate('${date.date}')" class="action-btn" ${date.closed ? 'disabled' : ''}>
+                                ${date.closed ? 'ปิดแล้ว' : 'ปิดรับออเดอร์'}
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // เพิ่ม event listener สำหรับการคลิกเลือกวันที่
+                if (!date.closed) {
+                    card.addEventListener('click', () => selectOrderDate(date.date));
+                }
+                
+                orderDateGrid.appendChild(card);
+            });
+        }
+
+        function renderCategories() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            categoryTabs.innerHTML = `
+                <button class="category-tab ${window.selectedCategory === 'all' ? 'active' : ''}" 
+                        onclick="selectCategory('all')">
+                    ทั้งหมด
+                </button>
+            `;
+            
+            window.categories.forEach(category => {
+                categoryTabs.innerHTML += `
+                    <button class="category-tab ${window.selectedCategory === category.id ? 'active' : ''}"
+                            onclick="selectCategory('${category.id}')">
+                        ${category.name}
+                    </button>
+                `;
+            });
+        }
+
+        function renderUnits() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการหน่วยนับ</h2>
+                    <div class="form-group">
+                        <label>เพิ่มหน่วยนับใหม่</label>
+                        <input type="text" id="newUnitInput" class="form-input" placeholder="ระบุชื่อหน่วยนับ">
+                        <button onclick="addUnit()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="units-list">
+                        ${window.units.map(unit => `
+                            <div class="unit-item">
+                                <span>${unit.name}</span>
+                                <button onclick="deleteUnit('${unit.id}')" class="delete-btn">ลบ</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductManagement() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการสินค้า</h2>
+                    <div class="form-group">
+                        <label>เพิ่มสินค้าใหม่</label>
+                        <input type="text" id="newProductName" class="form-input" placeholder="ชื่อสินค้า">
+                        <select id="productCategory" class="form-input">
+                            ${window.categories.map(cat => 
+                                `<option value="${cat.id}">${cat.name}</option>`
+                            ).join('')}
+                        </select>
+                        <select id="productUnit" class="form-input">
+                            ${window.units.map(unit => 
+                                `<option value="${unit.id}">${unit.name}</option>`
+                            ).join('')}
+                        </select>
+                        <button onclick="addProduct()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="products-list">
+                        ${window.products.map(product => `
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <span class="product-name">${product.name}</span>
+                                    <span class="product-category">${getCategoryName(product.category)}</span>
+                                    <span class="product-unit">${getUnitName(product.unit)}</span>
+                                </div>
+                                <div class="product-controls">
+                                    <button onclick="editProduct('${product.id}')" class="edit-btn">แก้ไข</button>
+                                    <button onclick="deleteProduct('${product.id}')" class="delete-btn">ลบ</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add reset password function
+        async function resetPassword(userId) {
+          if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรหัสผ่านของผู้ใช้นี้?')) {
+            return;
+          }
+          
+          showLoading(true);
+          try {
+            const response = await fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({
+                action: 'resetPassword',
+                userId: userId
+              })
+            });
+            
+            const result = await response.json();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            
+            alert('ลบรหัสผ่านเรียบร้อยแล้ว');
+            loadUsers(); // Refresh user list
+          } catch (error) {
+            showError(error.message);
+          } finally {
+            showLoading(false);
+          }
+        }
+
+        // Update user list display to include reset password button
+        function displayUsers(users) {
+          const container = document.getElementById('userList');
+          container.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>รหัสผู้ใช้</th>
+                  <th>ชื่อ</th>
+                  <th>ตำแหน่ง</th>
+                  <th>การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users.map(user => `
+                  <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>
+                      <button onclick="resetPassword('${user.id}')" class="btn btn-warning btn-sm">
+                        ลบรหัสผ่าน
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        // --- Helper Functions ---
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('th-TH', options);
+        }
+
+        function getCategoryName(categoryId) {
+            const category = window.categories.find(c => c.id === categoryId);
+            return category ? category.name : 'ไม่ระบุหมวดหมู่';
+        }
+
+        function getUnitName(unitId) {
+            const unit = window.units.find(u => u.id === unitId);
+            return unit ? unit.name : 'ไม่ระบุหน่วย';
+        }
+
+        function selectCategory(categoryId) {
+            window.selectedCategory = categoryId;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('onclick').includes(categoryId));
+            });
+            renderProducts();
+        }
+
+        // เพิ่มฟังก์ชัน goHome
+        function goHome() {
+            // ซ่อน admin panel ถ้ากำลังแสดงอยู่
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('orderSection').style.display = 'block';
+            
+            // รีเซ็ตการเลือกวันที่และหมวดหมู่
+            window.selectedOrderDate = null;
+            window.selectedCategory = 'all';
+            
+            // อัพเดท UI
+            renderUI();
+        }
+    </script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">🔐</div>
+            <h2 class="login-title">เข้าสู่ระบบ</h2>
+            <div id="loginError" class="error-message"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">ชื่อผู้ใช้</label>
+                    <input type="text" class="form-input" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-input" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo" onclick="goHome()" style="cursor: pointer;" title="กลับไปหน้าแรก">
+                    <span>📦</span>
+                    <span>ระบบสั่งของภายใน</span>
+                </div>
+                <div class="header-nav">
+                    <div class="user-info">
+                        <span>👤</span>
+                        <span id="currentUser">User</span>
+                    </div>
+                    <button class="nav-btn" onclick="openCart()"></button>
+                        <span>🛒 ตะกร้า</span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                    <button id="adminBtn" class="nav-btn hidden" onclick="toggleAdminPanel()">
+                        <span>⚙️ ตั้งค่า</span>
+                    </button>
+                    <button class="nav-btn" onclick="logout()">
+                        <span>🚪 ออกจากระบบ</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Order Section -->
+            <div id="orderSection">
+                <div class="department-section">
+                    <h2>1. เลือกวันที่สั่งซื้อ</h2>
+                    <div class="department-grid" id="orderDateGrid">
+                        <!-- Order Dates will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div id="categorySection" class="hidden">
+                    <h2>2. เลือกสินค้า</h2>
+                    <div class="category-tabs" id="categoryTabs">
+                        <!-- Categories will be dynamically inserted here -->
+                    </div>
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <input type="text" class="form-input" id="searchInput" placeholder="🔍 ค้นหาชื่อสินค้า...">
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="admin-panel">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('manageDates')">จัดการวันสั่งซื้อ</button>
+                    <button class="admin-tab" onclick="showAdminTab('summary')">สรุปยอดสั่งซื้อ</button>
+                    <button class="admin-tab" onclick="showAdminTab('units')">จัดการหน่วยนับ</button>
+                    <button class="admin-tab" onclick="showAdminTab('products')">ข้อมูลสินค้า</button>
+                    <button class="admin-tab" onclick="showAdminTab('departments')">ข้อมูลแผนก</button>
+                    <button class="admin-tab" onclick="showAdminTab('categories')">ข้อมูลหมวดหมู่</button>
+                    <button class="admin-tab" onclick="showAdminTab('users')">ข้อมูลผู้ใช้</button>
+                </div>
+
+                <div id="adminContent">
+                    <!-- Admin content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="cart-modal" id="cartModal">
+            <div class="cart-content">
+                <div class="cart-header">
+                    <h2 id="cartTitle">ตะกร้าสินค้า</h2>
+                    <button class="close-cart" onclick="closeCart()">&times;</button>
+                </div>
+                <div id="cartItems">
+                    <!-- Cart items will be dynamically inserted here -->
+                </div>
+                <div class="cart-total">
+                    <button id="deleteOrderBtn" class="delete-btn hidden" onclick="deleteCurrentOrder()">ยกเลิกคำสั่งซื้อ</button>
+                    <button id="checkoutBtn" class="checkout-btn">ยืนยันการสั่งซื้อ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Area -->
+    <div id="print-area"></div>
+
+    <script>
+        // --- Google Sheet Integration ---
+        window.SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5k7Glcq1g1UIgtfOrQoXQSufBBwNiuFo1whAds3Onzr8v4PWRRmy3sA2DW6_og1NgVA/exec';
+        window.SPREADSHEET_ID = '1k3g208t8UhaRC5Gig5oht7KpUVWTbtWPJmzAVEgYFWU';
+
+        // State management
+        window.currentUser = null;
+        window.selectedOrderDate = null;
+        window.selectedDepartment = '';
+        window.selectedCategory = 'all';
+        window.cart = [];
+        window.activeAdminTab = 'manageDates';
+        window.currentSummaryData = [];
+        window.existingOrderId = null;
+
+        // Data stores
+        window.users = [];
+        window.departments = [];
+        window.categories = [];
+        let products = [];
+        let orderDates = [];
+        let units = [];
+
+        // --- API Functions ---
+        async function fetchData(action, params = {}) {
+            const queryParams = new URLSearchParams({
+                action,
+                ...params
+            }).toString();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?${queryParams}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update local data stores if appropriate
+                if (action === 'getData') {
+                    if (data.users) users = data.users;
+                    if (data.departments) departments = data.departments;
+                    if (data.categories) categories = data.categories;
+                    if (data.products) products = data.products;
+                    if (data.orderDates) orderDates = data.orderDates;
+                    if (data.units) units = data.units;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showNotification(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        async function postData(action, payload) {
+            showNotification('กำลังดำเนินการ...', false);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...payload
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // On success, refresh the relevant data
+                if (['addOrder', 'updateOrder', 'deleteOrder'].includes(action)) {
+                    await loadOrderDates();
+                } else if (['addProduct', 'updateProduct', 'deleteProduct'].includes(action)) {
+                    await loadProducts();
+                }
+                
+                // Show success message
+                showNotification(data.message || 'ดำเนินการเรียบร้อย');
+                return data;
+            } catch (error) {
+                console.error('Error posting data:', error);
+                showNotification(`เกิดข้อผิดพลาด: ${error.message}`, true);
+                throw error;
+            }
+        }
+
+        // --- Data Loading Functions ---
+        async function loadInitialData() {
+            try {
+                const data = await fetchData('getData');
+                renderUI();
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        async function loadOrderDates() {
+            try {
+                const data = await fetchData('getOrderDates');
+                if (data.orderDates) {
+                    orderDates = data.orderDates;
+                    renderOrderDates();
+                }
+            } catch (error) {
+                console.error('Error loading order dates:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const data = await fetchData('getProducts');
+                if (data.products) {
+                    products = data.products;
+                    renderProducts();
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // --- Authentication Functions ---
+        async function login(username) {
+            try {
+                const response = await fetchData('login', { username });
+                const user = response.user;
+                
+                if (!user) {
+                    throw new Error('ไม่พบข้อมูลผู้ใช้');
+                }
+                
+                // Store user info
+                window.currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                updateUIForLoggedInUser();
+                showNotification('เข้าสู่ระบบสำเร็จ');
+                
+                // Load initial data
+                await loadInitialData();
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, true);
+            }
+        }
+
+        function logout() {
+            // Clear user data
+            window.currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            
+            // Clear all data stores
+            window.users = [];
+            window.departments = [];
+            window.categories = [];
+            window.products = [];
+            window.orderDates = [];
+            window.units = [];
+            window.cart = [];
+            
+            // Reset UI state
+            window.selectedOrderDate = null;
+            window.selectedDepartment = '';
+            window.selectedCategory = 'all';
+            window.activeAdminTab = 'manageDates';
+            
+            // Update UI
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminBtn').classList.add('hidden');
+            
+            showNotification('ออกจากระบบสำเร็จ');
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('currentUser').textContent = window.currentUser.name;
+            
+            // Show admin button for admin users
+            if (window.currentUser.isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+            }
+        }
+
+        // --- Utility Functions ---
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.backgroundColor = isError ? '#ff5252' : '#4caf50';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+          const errorDiv = document.getElementById('error-message');
+          if (!errorDiv) {
+            const div = document.createElement('div');
+            div.id = 'error-message';
+            div.style.color = 'red';
+            div.style.padding = '10px';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          errorDiv.textContent = message;
+          setTimeout(() => {
+            errorDiv.textContent = '';
+          }, 3000);
+        }
+
+        function showLoading(show = true) {
+          const loadingDiv = document.getElementById('loading');
+          if (!loadingDiv) {
+            const div = document.createElement('div');
+            div.id = 'loading';
+            div.style.display = 'none';
+            div.textContent = 'กำลังดำเนินการ...';
+            document.body.insertBefore(div, document.body.firstChild);
+          }
+          loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        // --- UI Rendering Functions ---
+        function renderUI() {
+            // แสดงหน้าหลักหลังจาก login
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // เรียกใช้ฟังก์ชันแสดงผลต่างๆ
+            renderOrderDates();
+            renderCategories();
+            updateCartCount();
+        }
+
+        function renderOrderDates() {
+            const orderDateGrid = document.getElementById('orderDateGrid');
+            orderDateGrid.innerHTML = '';
+            
+            if (!window.orderDates || window.orderDates.length === 0) {
+                orderDateGrid.innerHTML = '<p class="empty-message">ไม่มีวันที่สั่งซื้อที่เปิดรับ</p>';
+                return;
+            }
+            
+            window.orderDates.forEach(date => {
+                const card = document.createElement('div');
+                card.className = 'order-date-card';
+                if (date.date === window.selectedOrderDate) {
+                    card.classList.add('selected');
+                }
+                if (date.closed) {
+                    card.classList.add('closed');
+                }
+                
+                card.dataset.date = date.date;
+                card.innerHTML = `
+                    <div class="date-info">
+                        <div class="date">${formatDate(date.date)}</div>
+                        <div class="status">${date.closed ? '🔒 ปิดรับออเดอร์' : '🔓 เปิดรับออเดอร์'}</div>
+                    </div>
+                    ${date.hasOwnProperty('orderCount') ? `
+                        <div class="order-count">
+                            จำนวนออเดอร์: ${date.orderCount}
+                        </div>
+                    ` : ''}
+                    ${window.currentUser?.isAdmin ? `
+                        <div class="admin-controls">
+                            <button onclick="closeOrderDate('${date.date}')" class="action-btn" ${date.closed ? 'disabled' : ''}>
+                                ${date.closed ? 'ปิดแล้ว' : 'ปิดรับออเดอร์'}
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // เพิ่ม event listener สำหรับการคลิกเลือกวันที่
+                if (!date.closed) {
+                    card.addEventListener('click', () => selectOrderDate(date.date));
+                }
+                
+                orderDateGrid.appendChild(card);
+            });
+        }
+
+        function renderCategories() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            categoryTabs.innerHTML = `
+                <button class="category-tab ${window.selectedCategory === 'all' ? 'active' : ''}" 
+                        onclick="selectCategory('all')">
+                    ทั้งหมด
+                </button>
+            `;
+            
+            window.categories.forEach(category => {
+                categoryTabs.innerHTML += `
+                    <button class="category-tab ${window.selectedCategory === category.id ? 'active' : ''}"
+                            onclick="selectCategory('${category.id}')">
+                        ${category.name}
+                    </button>
+                `;
+            });
+        }
+
+        function renderUnits() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการหน่วยนับ</h2>
+                    <div class="form-group">
+                        <label>เพิ่มหน่วยนับใหม่</label>
+                        <input type="text" id="newUnitInput" class="form-input" placeholder="ระบุชื่อหน่วยนับ">
+                        <button onclick="addUnit()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="units-list">
+                        ${window.units.map(unit => `
+                            <div class="unit-item">
+                                <span>${unit.name}</span>
+                                <button onclick="deleteUnit('${unit.id}')" class="delete-btn">ลบ</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductManagement() {
+            const adminContent = document.getElementById('adminContent');
+            adminContent.innerHTML = `
+                <div class="admin-section">
+                    <h2>จัดการสินค้า</h2>
+                    <div class="form-group">
+                        <label>เพิ่มสินค้าใหม่</label>
+                        <input type="text" id="newProductName" class="form-input" placeholder="ชื่อสินค้า">
+                        <select id="productCategory" class="form-input">
+                            ${window.categories.map(cat => 
+                                `<option value="${cat.id}">${cat.name}</option>`
+                            ).join('')}
+                        </select>
+                        <select id="productUnit" class="form-input">
+                            ${window.units.map(unit => 
+                                `<option value="${unit.id}">${unit.name}</option>`
+                            ).join('')}
+                        </select>
+                        <button onclick="addProduct()" class="action-btn">เพิ่ม</button>
+                    </div>
+                    <div class="products-list">
+                        ${window.products.map(product => `
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <span class="product-name">${product.name}</span>
+                                    <span class="product-category">${getCategoryName(product.category)}</span>
+                                    <span class="product-unit">${getUnitName(product.unit)}</span>
+                                </div>
+                                <div class="product-controls">
+                                    <button onclick="editProduct('${product.id}')" class="edit-btn">แก้ไข</button>
+                                    <button onclick="deleteProduct('${product.id}')" class="delete-btn">ลบ</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add reset password function
+        async function resetPassword(userId) {
+          if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรหัสผ่านของผู้ใช้นี้?')) {
+            return;
+          }
+          
+          showLoading(true);
+          try {
+            const response = await fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({
+                action: 'resetPassword',
+                userId: userId
+              })
+            });
+            
+            const result = await response.json();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            
+            alert('ลบรหัสผ่านเรียบร้อยแล้ว');
+            loadUsers(); // Refresh user list
+          } catch (error) {
+            showError(error.message);
+          } finally {
+            showLoading(false);
+          }
+        }
+
+        // Update user list display to include reset password button
+        function displayUsers(users) {
+          const container = document.getElementById('userList');
+          container.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>รหัสผู้ใช้</th>
+                  <th>ชื่อ</th>
+                  <th>ตำแหน่ง</th>
+                  <th>การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users.map(user => `
+                  <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>
+                      <button onclick="resetPassword('${user.id}')" class="btn btn-warning btn-sm">
+                        ลบรหัสผ่าน
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        // --- Helper Functions ---
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('th-TH', options);
+        }
+
+        function getCategoryName(categoryId) {
+            const category = window.categories.find(c => c.id === categoryId);
+            return category ? category.name : 'ไม่ระบุหมวดหมู่';
+        }
+
+        function getUnitName(unitId) {
+            const unit = window.units.find(u => u.id === unitId);
+            return unit ? unit.name : 'ไม่ระบุหน่วย';
+        }
+
+        function selectCategory(categoryId) {
+            window.selectedCategory = categoryId;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('onclick').includes(categoryId));
+            });
+            renderProducts();
+        }
+
+        // เพิ่มฟังก์ชัน goHome
+        function goHome() {
+            // ซ่อน admin panel ถ้ากำลังแสดงอยู่
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('orderSection').style.display = 'block';
+            
+            // รีเซ็ตการเลือกวันที่และหมวดหมู่
+            window.selectedOrderDate = null;
+            window.selectedCategory = 'all';
+            
+            // อัพเดท UI
+            renderUI();
+        }
+    </script>
+</body>
+</html>
